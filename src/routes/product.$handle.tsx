@@ -81,11 +81,8 @@ function ProductDetailPage() {
 
   const handleAddToCart = async () => {
     if (!selectedVariant) return;
-    const item: Omit<ShopifyProduct, "node"> & {
-      node: ShopifyProduct["node"];
-    } = { node: product };
     await addItem({
-      product: item,
+      product: { node: product },
       variantId: selectedVariant.id,
       variantTitle: selectedVariant.title,
       price: selectedVariant.price,
