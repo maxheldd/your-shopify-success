@@ -125,7 +125,6 @@ function ProductDetailPage() {
             <p className="mt-4 text-2xl font-semibold">
               {price.currencyCode} {parseFloat(price.amount).toFixed(2)}
             </p>
-            <p className="mt-6 text-muted-foreground leading-relaxed">{product.description}</p>
 
             {product.options.map((option) => (
               <div key={option.name} className="mt-6">
@@ -159,6 +158,15 @@ function ProductDetailPage() {
               )}
               {selectedVariant?.availableForSale ? "Add to Cart" : "Out of Stock"}
             </Button>
+
+            {product.description && (
+              <div className="mt-10">
+                <h2 className="text-lg font-semibold mb-3">Description</h2>
+                <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                  {product.description}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
