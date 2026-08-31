@@ -11,7 +11,7 @@ import {
 } from "./shopify.server";
 
 export const getProducts = createServerFn({ method: "GET" })
-  .inputValidator((data) =>
+  .validator((data) =>
     z
       .object({
         first: z.number().default(20),
@@ -24,13 +24,13 @@ export const getProducts = createServerFn({ method: "GET" })
   });
 
 export const getProductByHandle = createServerFn({ method: "GET" })
-  .inputValidator((data) => z.object({ handle: z.string() }).parse(data))
+  .validator((data) => z.object({ handle: z.string() }).parse(data))
   .handler(async ({ data }) => {
     return fetchProductByHandle(data.handle);
   });
 
 export const createCart = createServerFn({ method: "POST" })
-  .inputValidator((data) =>
+  .validator((data) =>
     z
       .object({
         quantity: z.number(),
@@ -43,7 +43,7 @@ export const createCart = createServerFn({ method: "POST" })
   });
 
 export const addCartLine = createServerFn({ method: "POST" })
-  .inputValidator((data) =>
+  .validator((data) =>
     z
       .object({
         cartId: z.string(),
@@ -60,7 +60,7 @@ export const addCartLine = createServerFn({ method: "POST" })
   });
 
 export const updateCartLine = createServerFn({ method: "POST" })
-  .inputValidator((data) =>
+  .validator((data) =>
     z
       .object({
         cartId: z.string(),
@@ -74,7 +74,7 @@ export const updateCartLine = createServerFn({ method: "POST" })
   });
 
 export const removeCartLine = createServerFn({ method: "POST" })
-  .inputValidator((data) =>
+  .validator((data) =>
     z
       .object({
         cartId: z.string(),
@@ -87,7 +87,7 @@ export const removeCartLine = createServerFn({ method: "POST" })
   });
 
 export const getCart = createServerFn({ method: "GET" })
-  .inputValidator((data) => z.object({ cartId: z.string() }).parse(data))
+  .validator((data) => z.object({ cartId: z.string() }).parse(data))
   .handler(async ({ data }) => {
     return fetchCart(data.cartId);
   });
