@@ -64,95 +64,6 @@ export const Route = createFileRoute("/product/$handle")({
   ),
 });
 
-const HEAT_LEVEL_ORDER = ["3 Level", "4 Level", "5 Level", "Red Light", "6 Level (3-in-1)", "Airbag"];
-
-function normalizeHeatLevel(title: string): string {
-  const lower = title.toLowerCase();
-  if (lower.includes("3 level") || lower.includes("3-level")) return "3 Level";
-  if (lower.includes("4 level") || lower.includes("4-level")) return "4 Level";
-  if (lower.includes("5 level") || lower.includes("5-level")) return "5 Level";
-  if (lower.includes("6 level") || lower.includes("6-level") || lower.includes("3-in-1")) return "6 Level (3-in-1)";
-  if (lower.includes("red led") || lower.includes("660nm") || lower.includes("red light")) return "Red Light";
-  if (lower.includes("airbag")) return "Airbag";
-  return "Other";
-}
-
-function deriveStyle(title: string, heatLevel: string): string {
-  const lower = title.toLowerCase();
-  let style = title;
-
-  // Remove heat-level markers
-  style = style.replace(/[-\s]?(3|4|5|6)\s?level/gi, "");
-  style = style.replace(/[-\s]?660nm\s?red\s?led/gi, "");
-  style = style.replace(/[-\s]?red\s?led/gi, "");
-  style = style.replace(/[-\s]?3-in-1\s?type/gi, "");
-  style = style.replace(/[-\s]?3-in-1/gi, "");
-  style = style.trim();
-
-  // Normalize casing
-  style = style
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
-
-  if (heatLevel === "Red Light") {
-    if (lower.includes("ankle")) return "Ankle (40 beads)";
-    if (lower.includes("wrist")) return "Wrist (24 beads)";
-  }
-
-  if (heatLevel === "6 Level (3-in-1)") {
-    if (lower.includes("black")) return "3-in-1 black";
-    if (lower.includes("grey") || lower.includes("gray")) return "3-in-1 grey";
-    return "3-in-1";
-  }
-
-  if (!style) return "Standard";
-  return style;
-}
-
-interface VariantGroup {
-  heatLevels: string[];
-  stylesByHeatLevel: Record<string, string[]>;
-  variantByHeatAndStyle: Record<string, Record<string, ShopifyProductVariant>>;
-}
-
-function groupVariants(variants: ShopifyProductVariant[]): VariantGroup {
-  const groups: Record<string, Set<string>> = {};
-  const variantMap: Record<string, Record<string, ShopifyProductVariant>> = {};
-
-  for (const variant of variants) {
-    const heatLevel = normalizeHeatLevel(variant.title);
-    const style = deriveStyle(variant.title, heatLevel);
-
-    if (!groups[heatLevel]) groups[heatLevel] = new Set();
-    groups[heatLevel].add(style);
-
-    if (!variantMap[heatLevel]) variantMap[heatLevel] = {};
-    variantMap[heatLevel][style] = variant;
-  }
-
-  const heatLevels = HEAT_LEVEL_ORDER.filter((h) => groups[h]).concat(
-    Object.keys(groups).filter((h) => !HEAT_LEVEL_ORDER.includes(h)),
-  );
-
-  const stylesByHeatLevel: Record<string, string[]> = {};
-  for (const heatLevel of heatLevels) {
-    const styles = Array.from(groups[heatLevel] ?? new Set());
-    // Try to put ankle variants first, then wrist, then neck for readability
-    stylesByHeatLevel[heatLevel] = styles.sort((a, b) => {
-      const order = ["ankle", "wrist", "neck", "3-in-1"];
-      const indexA = order.findIndex((k) => a.toLowerCase().includes(k));
-      const indexB = order.findIndex((k) => b.toLowerCase().includes(k));
-      if (indexA !== -1 && indexB !== -1) return indexA - indexB;
-      if (indexA !== -1) return -1;
-      if (indexB !== -1) return 1;
-      return a.localeCompare(b);
-    });
-  }
-
-  return { heatLevels, stylesByHeatLevel, variantByHeatAndStyle: variantMap };
-}
-
 function getSpecsForHeatLevel(heatLevel: string) {
   const base = {
     "3 Level": {
@@ -193,7 +104,8 @@ function getSpecsForHeatLevel(heatLevel: string) {
     },
   };
 
-  const specs = base[heatLevel as keyof typeof base] ?? base["3 Level"];
+  const specs = base[heatLevel as keyof typeof base];
+  if (!specs) return [];
   return [
     { label: "Battery", value: specs.battery },
     { label: "Charge time", value: specs.chargeTime },
@@ -201,6 +113,16 @@ function getSpecsForHeatLevel(heatLevel: string) {
     { label: "Auto shut-off", value: specs.autoShutoff },
   ];
 }
+
+/** Turns a Shopify plain-text description into 3-5 scannable bullets. */
+function descriptionBullets(description: string): string[] {
+  return description
+    .split(/\r?\n|(?<=\.)\s+(?=[A-Z0-9])/)
+    .map((line) => line.replace(/^[•\-*\u2022]\s*/, "").trim())
+    .filter((line) => line.length > 25 && line.length < 220)
+    .slice(0, 5);
+}
+
 
 function formatPrice(amount: string, currencyCode: string) {
   return `${currencyCode} ${parseFloat(amount).toFixed(2)}`;
