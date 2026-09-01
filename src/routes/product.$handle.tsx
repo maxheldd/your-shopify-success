@@ -240,26 +240,44 @@ function ProductDetailPage() {
     [product.images.edges],
   );
 
-  const { heatLevels, stylesByHeatLevel, variantByHeatAndStyle } = useMemo(
-    () => groupVariants(variants),
-    [variants],
+  const model = useMemo(
+    () => buildVariantModel(variants, product.options ?? []),
+    [variants, product.options],
   );
 
-  const [heatLevel, setHeatLevel] = useState(heatLevels[0] ?? "");
-  const [style, setStyle] = useState("");
+  const [selection, setSelection] = useState<string[]>([]);
   const [quantity, setQuantity] = useState(1);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
 
-  // Reset style when heat level changes and pick first available style
+  // Initialise / repair the selection so every axis always holds a valid value
   useEffect(() => {
-    const availableStyles = stylesByHeatLevel[heatLevel] ?? [];
-    setStyle(availableStyles[0] ?? "");
-  }, [heatLevel, stylesByHeatLevel]);
+    setSelection((current) => {
+      const next: string[] = [];
+      for (let index = 0; index < model.axisNames.length; index += 1) {
+        const options = valuesForAxis(model, index, next);
+        const existing = current[index];
+        next.push(existing && options.includes(existing) ? existing : (options[0] ?? ""));
+      }
+      return next;
+    });
+  }, [model]);
 
-  const selectedVariant = useMemo(() => {
-    if (!heatLevel || !style) return null;
-    return variantByHeatAndStyle[heatLevel]?.[style] ?? null;
-  }, [heatLevel, style, variantByHeatAndStyle]);
+  const handleAxisChange = (axisIndex: number, value: string) => {
+    setSelection((current) => {
+      const next = current.slice(0, axisIndex);
+      next[axisIndex] = value;
+      // Reset every downstream axis to its first available value
+      for (let index = axisIndex + 1; index < model.axisNames.length; index += 1) {
+        next.push(valuesForAxis(model, index, next)[0] ?? "");
+      }
+      return next;
+    });
+  };
+
+  const selectedVariant = useMemo(
+    () => findVariant(model, selection),
+    [model, selection],
+  );
 
   // Jump gallery to variant image when selection changes
   useEffect(() => {
@@ -288,13 +306,20 @@ function ProductDetailPage() {
   };
 
   const price = selectedVariant?.price ?? product.priceRange.minVariantPrice;
-  const compareAtAmount = selectedVariant?.compareAtPrice
+  const listedCompareAt = selectedVariant?.compareAtPrice
     ? parseFloat(selectedVariant.compareAtPrice.amount)
-    : parseFloat(price.amount) * 2;
+    : 0;
+  const compareAtAmount =
+    listedCompareAt > parseFloat(price.amount) ? listedCompareAt : parseFloat(price.amount) * 2;
   const savings = compareAtAmount - parseFloat(price.amount);
   const savingsPercent = compareAtAmount > 0 ? Math.round((savings / compareAtAmount) * 100) : 0;
 
-  const selectedVariantName = selectedVariant ? `${heatLevel} — ${style}` : "Select options";
+  const heatLevel = model.axisNames[0] === "Heat level" ? (selection[0] ?? "") : "";
+  const bullets = useMemo(() => descriptionBullets(product.description ?? ""), [product.description]);
+  const selectedVariantName = selectedVariant
+    ? selection.filter(Boolean).join(" — ") || selectedVariant.title
+    : "Select options";
+
 
   return (
     <main className="min-h-screen px-4 py-8 md:py-12">
