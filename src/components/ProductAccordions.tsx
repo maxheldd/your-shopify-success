@@ -12,9 +12,28 @@ interface Spec {
 
 interface ProductAccordionsProps {
   specs: Spec[];
+  bullets?: string[];
+  included?: string[];
 }
 
-export function ProductAccordions({ specs }: ProductAccordionsProps) {
+const DEFAULT_BULLETS = [
+  "Combines targeted heat with gentle vibration to soothe stiff joints and tired muscles.",
+  "Adjustable wrap fits ankles, wrists, or neck depending on the style you choose.",
+  "Cordless, rechargeable design — use it on the couch, at your desk, or while traveling.",
+  "Built-in auto shut-off and overheat protection for safe daily sessions.",
+];
+
+const DEFAULT_INCLUDED = [
+  "1 × Product in the option you selected",
+  "1 × Type-C charging cable",
+  "1 × Instruction manual (English)",
+  "1 × Retail box",
+];
+
+export function ProductAccordions({ specs, bullets, included }: ProductAccordionsProps) {
+  const descriptionBullets = bullets?.length ? bullets : DEFAULT_BULLETS;
+  const includedItems = included?.length ? included : DEFAULT_INCLUDED;
+
   return (
     <Accordion type="multiple" defaultValue={["description"]} className="w-full">
       <AccordionItem value="description">
@@ -22,20 +41,21 @@ export function ProductAccordions({ specs }: ProductAccordionsProps) {
         <AccordionContent>
           <div className="space-y-4 pb-2">
             <ul className="list-disc space-y-1.5 pl-4 text-sm text-muted-foreground">
-              <li>Combines targeted heat with gentle vibration to soothe stiff joints and tired muscles.</li>
-              <li>Adjustable wrap fits ankles, wrists, or neck depending on the style you choose.</li>
-              <li>Cordless, rechargeable design — use it on the couch, at your desk, or while traveling.</li>
-              <li>Built-in auto shut-off and overheat protection for safe daily sessions.</li>
+              {descriptionBullets.map((bullet) => (
+                <li key={bullet}>{bullet}</li>
+              ))}
             </ul>
 
-            <div className="mt-4 grid grid-cols-2 gap-3 rounded-xl border bg-card p-4 text-sm">
-              {specs.map((spec) => (
-                <div key={spec.label}>
-                  <dt className="text-muted-foreground">{spec.label}</dt>
-                  <dd className="mt-0.5 font-medium">{spec.value}</dd>
-                </div>
-              ))}
-            </div>
+            {specs.length > 0 && (
+              <div className="mt-4 grid grid-cols-2 gap-3 rounded-xl border bg-card p-4 text-sm">
+                {specs.map((spec) => (
+                  <div key={spec.label}>
+                    <dt className="text-muted-foreground">{spec.label}</dt>
+                    <dd className="mt-0.5 font-medium">{spec.value}</dd>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </AccordionContent>
       </AccordionItem>
@@ -44,13 +64,13 @@ export function ProductAccordions({ specs }: ProductAccordionsProps) {
         <AccordionTrigger>What&apos;s included</AccordionTrigger>
         <AccordionContent>
           <ul className="list-disc space-y-1.5 pl-4 text-sm text-muted-foreground">
-            <li>1 × Heated vibration massager (selected style)</li>
-            <li>1 × Type-C charging cable</li>
-            <li>1 × Instruction manual (English)</li>
-            <li>1 × Color box</li>
+            {includedItems.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
           </ul>
         </AccordionContent>
       </AccordionItem>
+
 
       <AccordionItem value="materials">
         <AccordionTrigger>Materials and care</AccordionTrigger>
