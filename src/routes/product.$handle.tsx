@@ -440,7 +440,7 @@ function ProductDetailPage() {
             <TrustRow />
 
             <FadeIn delay={100} className="mt-10">
-              <ProductAccordions specs={getSpecsForHeatLevel(heatLevel)} />
+              <ProductAccordions specs={getSpecsForHeatLevel(heatLevel)} bullets={bullets} />
             </FadeIn>
           </div>
         </div>
