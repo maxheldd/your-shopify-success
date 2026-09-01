@@ -30,7 +30,7 @@ import { ProductAccordions } from "@/components/ProductAccordions";
 import { ProductReviews, StarRating } from "@/components/ProductReviews";
 import { useInView } from "@/hooks/useInView";
 import { cn } from "@/lib/utils";
-import type { ShopifyProductVariant } from "@/lib/shopify";
+import { buildVariantModel, findVariant, valuesForAxis } from "@/lib/variantOptions";
 
 export const Route = createFileRoute("/product/$handle")({
   head: ({ params }) => ({
@@ -63,95 +63,6 @@ export const Route = createFileRoute("/product/$handle")({
     </div>
   ),
 });
-
-const HEAT_LEVEL_ORDER = ["3 Level", "4 Level", "5 Level", "Red Light", "6 Level (3-in-1)", "Airbag"];
-
-function normalizeHeatLevel(title: string): string {
-  const lower = title.toLowerCase();
-  if (lower.includes("3 level") || lower.includes("3-level")) return "3 Level";
-  if (lower.includes("4 level") || lower.includes("4-level")) return "4 Level";
-  if (lower.includes("5 level") || lower.includes("5-level")) return "5 Level";
-  if (lower.includes("6 level") || lower.includes("6-level") || lower.includes("3-in-1")) return "6 Level (3-in-1)";
-  if (lower.includes("red led") || lower.includes("660nm") || lower.includes("red light")) return "Red Light";
-  if (lower.includes("airbag")) return "Airbag";
-  return "Other";
-}
-
-function deriveStyle(title: string, heatLevel: string): string {
-  const lower = title.toLowerCase();
-  let style = title;
-
-  // Remove heat-level markers
-  style = style.replace(/[-\s]?(3|4|5|6)\s?level/gi, "");
-  style = style.replace(/[-\s]?660nm\s?red\s?led/gi, "");
-  style = style.replace(/[-\s]?red\s?led/gi, "");
-  style = style.replace(/[-\s]?3-in-1\s?type/gi, "");
-  style = style.replace(/[-\s]?3-in-1/gi, "");
-  style = style.trim();
-
-  // Normalize casing
-  style = style
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
-
-  if (heatLevel === "Red Light") {
-    if (lower.includes("ankle")) return "Ankle (40 beads)";
-    if (lower.includes("wrist")) return "Wrist (24 beads)";
-  }
-
-  if (heatLevel === "6 Level (3-in-1)") {
-    if (lower.includes("black")) return "3-in-1 black";
-    if (lower.includes("grey") || lower.includes("gray")) return "3-in-1 grey";
-    return "3-in-1";
-  }
-
-  if (!style) return "Standard";
-  return style;
-}
-
-interface VariantGroup {
-  heatLevels: string[];
-  stylesByHeatLevel: Record<string, string[]>;
-  variantByHeatAndStyle: Record<string, Record<string, ShopifyProductVariant>>;
-}
-
-function groupVariants(variants: ShopifyProductVariant[]): VariantGroup {
-  const groups: Record<string, Set<string>> = {};
-  const variantMap: Record<string, Record<string, ShopifyProductVariant>> = {};
-
-  for (const variant of variants) {
-    const heatLevel = normalizeHeatLevel(variant.title);
-    const style = deriveStyle(variant.title, heatLevel);
-
-    if (!groups[heatLevel]) groups[heatLevel] = new Set();
-    groups[heatLevel].add(style);
-
-    if (!variantMap[heatLevel]) variantMap[heatLevel] = {};
-    variantMap[heatLevel][style] = variant;
-  }
-
-  const heatLevels = HEAT_LEVEL_ORDER.filter((h) => groups[h]).concat(
-    Object.keys(groups).filter((h) => !HEAT_LEVEL_ORDER.includes(h)),
-  );
-
-  const stylesByHeatLevel: Record<string, string[]> = {};
-  for (const heatLevel of heatLevels) {
-    const styles = Array.from(groups[heatLevel] ?? new Set());
-    // Try to put ankle variants first, then wrist, then neck for readability
-    stylesByHeatLevel[heatLevel] = styles.sort((a, b) => {
-      const order = ["ankle", "wrist", "neck", "3-in-1"];
-      const indexA = order.findIndex((k) => a.toLowerCase().includes(k));
-      const indexB = order.findIndex((k) => b.toLowerCase().includes(k));
-      if (indexA !== -1 && indexB !== -1) return indexA - indexB;
-      if (indexA !== -1) return -1;
-      if (indexB !== -1) return 1;
-      return a.localeCompare(b);
-    });
-  }
-
-  return { heatLevels, stylesByHeatLevel, variantByHeatAndStyle: variantMap };
-}
 
 function getSpecsForHeatLevel(heatLevel: string) {
   const base = {
@@ -193,7 +104,8 @@ function getSpecsForHeatLevel(heatLevel: string) {
     },
   };
 
-  const specs = base[heatLevel as keyof typeof base] ?? base["3 Level"];
+  const specs = base[heatLevel as keyof typeof base];
+  if (!specs) return [];
   return [
     { label: "Battery", value: specs.battery },
     { label: "Charge time", value: specs.chargeTime },
@@ -201,6 +113,16 @@ function getSpecsForHeatLevel(heatLevel: string) {
     { label: "Auto shut-off", value: specs.autoShutoff },
   ];
 }
+
+/** Turns a Shopify plain-text description into 3-5 scannable bullets. */
+function descriptionBullets(description: string): string[] {
+  return description
+    .split(/\r?\n|(?<=\.)\s+(?=[A-Z0-9])/)
+    .map((line) => line.replace(/^[•\-*\u2022]\s*/, "").trim())
+    .filter((line) => line.length > 25 && line.length < 220)
+    .slice(0, 5);
+}
+
 
 function formatPrice(amount: string, currencyCode: string) {
   return `${currencyCode} ${parseFloat(amount).toFixed(2)}`;
@@ -318,26 +240,44 @@ function ProductDetailPage() {
     [product.images.edges],
   );
 
-  const { heatLevels, stylesByHeatLevel, variantByHeatAndStyle } = useMemo(
-    () => groupVariants(variants),
-    [variants],
+  const model = useMemo(
+    () => buildVariantModel(variants, product.options ?? []),
+    [variants, product.options],
   );
 
-  const [heatLevel, setHeatLevel] = useState(heatLevels[0] ?? "");
-  const [style, setStyle] = useState("");
+  const [selection, setSelection] = useState<string[]>([]);
   const [quantity, setQuantity] = useState(1);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
 
-  // Reset style when heat level changes and pick first available style
+  // Initialise / repair the selection so every axis always holds a valid value
   useEffect(() => {
-    const availableStyles = stylesByHeatLevel[heatLevel] ?? [];
-    setStyle(availableStyles[0] ?? "");
-  }, [heatLevel, stylesByHeatLevel]);
+    setSelection((current) => {
+      const next: string[] = [];
+      for (let index = 0; index < model.axisNames.length; index += 1) {
+        const options = valuesForAxis(model, index, next);
+        const existing = current[index];
+        next.push(existing && options.includes(existing) ? existing : (options[0] ?? ""));
+      }
+      return next;
+    });
+  }, [model]);
 
-  const selectedVariant = useMemo(() => {
-    if (!heatLevel || !style) return null;
-    return variantByHeatAndStyle[heatLevel]?.[style] ?? null;
-  }, [heatLevel, style, variantByHeatAndStyle]);
+  const handleAxisChange = (axisIndex: number, value: string) => {
+    setSelection((current) => {
+      const next = current.slice(0, axisIndex);
+      next[axisIndex] = value;
+      // Reset every downstream axis to its first available value
+      for (let index = axisIndex + 1; index < model.axisNames.length; index += 1) {
+        next.push(valuesForAxis(model, index, next)[0] ?? "");
+      }
+      return next;
+    });
+  };
+
+  const selectedVariant = useMemo(
+    () => findVariant(model, selection),
+    [model, selection],
+  );
 
   // Jump gallery to variant image when selection changes
   useEffect(() => {
@@ -366,13 +306,20 @@ function ProductDetailPage() {
   };
 
   const price = selectedVariant?.price ?? product.priceRange.minVariantPrice;
-  const compareAtAmount = selectedVariant?.compareAtPrice
+  const listedCompareAt = selectedVariant?.compareAtPrice
     ? parseFloat(selectedVariant.compareAtPrice.amount)
-    : parseFloat(price.amount) * 2;
+    : 0;
+  const compareAtAmount =
+    listedCompareAt > parseFloat(price.amount) ? listedCompareAt : parseFloat(price.amount) * 2;
   const savings = compareAtAmount - parseFloat(price.amount);
   const savingsPercent = compareAtAmount > 0 ? Math.round((savings / compareAtAmount) * 100) : 0;
 
-  const selectedVariantName = selectedVariant ? `${heatLevel} — ${style}` : "Select options";
+  const heatLevel = model.axisNames[0] === "Heat level" ? (selection[0] ?? "") : "";
+  const bullets = useMemo(() => descriptionBullets(product.description ?? ""), [product.description]);
+  const selectedVariantName = selectedVariant
+    ? selection.filter(Boolean).join(" — ") || selectedVariant.title
+    : "Select options";
+
 
   return (
     <main className="min-h-screen px-4 py-8 md:py-12">
@@ -423,43 +370,45 @@ function ProductDetailPage() {
               )}
             </div>
 
-            <div className="mt-6 space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="heat-level" className="text-sm font-medium">
-                  Heat level
-                </label>
-                <Select value={heatLevel} onValueChange={setHeatLevel}>
-                  <SelectTrigger id="heat-level" className="w-full md:w-72">
-                    <SelectValue placeholder="Choose a heat level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {heatLevels.map((level) => (
-                      <SelectItem key={level} value={level}>
-                        {level}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            {model.axisNames.length > 0 && (
+              <div className="mt-6 space-y-4">
+                {model.axisNames.map((axisName, axisIndex) => {
+                  const options = valuesForAxis(model, axisIndex, selection);
+                  const disabled =
+                    axisIndex > 0 && !selection[axisIndex - 1];
+                  return (
+                    <div key={axisName} className="space-y-2">
+                      <label htmlFor={`axis-${axisIndex}`} className="text-sm font-medium">
+                        {axisName}
+                      </label>
+                      <Select
+                        value={selection[axisIndex] ?? ""}
+                        onValueChange={(value) => handleAxisChange(axisIndex, value)}
+                        disabled={disabled}
+                      >
+                        <SelectTrigger id={`axis-${axisIndex}`} className="w-full md:w-72">
+                          <SelectValue
+                            placeholder={
+                              disabled
+                                ? `Pick a ${model.axisNames[axisIndex - 1]?.toLowerCase()} first`
+                                : `Choose a ${axisName.toLowerCase()}`
+                            }
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {options.map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  );
+                })}
               </div>
+            )}
 
-              <div className="space-y-2">
-                <label htmlFor="style" className="text-sm font-medium">
-                  Style
-                </label>
-                <Select value={style} onValueChange={setStyle} disabled={!heatLevel}>
-                  <SelectTrigger id="style" className="w-full md:w-72">
-                    <SelectValue placeholder={heatLevel ? "Choose a style" : "Pick a heat level first"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(stylesByHeatLevel[heatLevel] ?? []).map((s) => (
-                      <SelectItem key={s} value={s}>
-                        {s}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
               <QuantityStepper quantity={quantity} onChange={setQuantity} />
@@ -491,7 +440,7 @@ function ProductDetailPage() {
             <TrustRow />
 
             <FadeIn delay={100} className="mt-10">
-              <ProductAccordions specs={getSpecsForHeatLevel(heatLevel)} />
+              <ProductAccordions specs={getSpecsForHeatLevel(heatLevel)} bullets={bullets} />
             </FadeIn>
           </div>
         </div>
