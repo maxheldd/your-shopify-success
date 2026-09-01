@@ -30,7 +30,7 @@ import { ProductAccordions } from "@/components/ProductAccordions";
 import { ProductReviews, StarRating } from "@/components/ProductReviews";
 import { useInView } from "@/hooks/useInView";
 import { cn } from "@/lib/utils";
-import type { ShopifyProductVariant } from "@/lib/shopify";
+import { buildVariantModel, findVariant, valuesForAxis } from "@/lib/variantOptions";
 
 export const Route = createFileRoute("/product/$handle")({
   head: ({ params }) => ({
