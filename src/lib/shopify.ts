@@ -1,6 +1,30 @@
 export const SHOPIFY_API_VERSION = "2025-07";
 export const SHOPIFY_STORE_DOMAIN = "3u21xz-zb.myshopify.com";
 
+export interface ShopifyProductImage {
+  url: string;
+  altText: string | null;
+}
+
+export interface ShopifyProductVariant {
+  id: string;
+  title: string;
+  price: {
+    amount: string;
+    currencyCode: string;
+  };
+  compareAtPrice?: {
+    amount: string;
+    currencyCode: string;
+  } | null;
+  availableForSale: boolean;
+  selectedOptions: Array<{
+    name: string;
+    value: string;
+  }>;
+  image?: ShopifyProductImage | null;
+}
+
 export interface ShopifyProduct {
   node: {
     id: string;
@@ -16,27 +40,12 @@ export interface ShopifyProduct {
     };
     images: {
       edges: Array<{
-        node: {
-          url: string;
-          altText: string | null;
-        };
+        node: ShopifyProductImage;
       }>;
     };
     variants: {
       edges: Array<{
-        node: {
-          id: string;
-          title: string;
-          price: {
-            amount: string;
-            currencyCode: string;
-          };
-          availableForSale: boolean;
-          selectedOptions: Array<{
-            name: string;
-            value: string;
-          }>;
-        };
+        node: ShopifyProductVariant;
       }>;
     };
     options: Array<{

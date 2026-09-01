@@ -33,7 +33,39 @@ async function storefrontApiRequest(query: string, variables: Record<string, unk
   return data;
 }
 
+const IMAGE_FRAGMENT = `
+  fragment ProductImage on Image {
+    url
+    altText
+  }
+`;
+
+const VARIANT_FRAGMENT = `
+  fragment ProductVariant on ProductVariant {
+    id
+    title
+    price {
+      amount
+      currencyCode
+    }
+    compareAtPrice {
+      amount
+      currencyCode
+    }
+    availableForSale
+    selectedOptions {
+      name
+      value
+    }
+    image {
+      ...ProductImage
+    }
+  }
+`;
+
 const PRODUCTS_QUERY = `
+  ${IMAGE_FRAGMENT}
+  ${VARIANT_FRAGMENT}
   query GetProducts($first: Int!, $query: String) {
     products(first: $first, query: $query) {
       edges {
@@ -49,28 +81,17 @@ const PRODUCTS_QUERY = `
               currencyCode
             }
           }
-          images(first: 5) {
+          images(first: 250) {
             edges {
               node {
-                url
-                altText
+                ...ProductImage
               }
             }
           }
-          variants(first: 10) {
+          variants(first: 100) {
             edges {
               node {
-                id
-                title
-                price {
-                  amount
-                  currencyCode
-                }
-                availableForSale
-                selectedOptions {
-                  name
-                  value
-                }
+                ...ProductVariant
               }
             }
           }
@@ -85,6 +106,8 @@ const PRODUCTS_QUERY = `
 `;
 
 const PRODUCT_BY_HANDLE_QUERY = `
+  ${IMAGE_FRAGMENT}
+  ${VARIANT_FRAGMENT}
   query GetProductByHandle($handle: String!) {
     product(handle: $handle) {
       id
@@ -98,28 +121,17 @@ const PRODUCT_BY_HANDLE_QUERY = `
           currencyCode
         }
       }
-      images(first: 5) {
+      images(first: 250) {
         edges {
           node {
-            url
-            altText
+            ...ProductImage
           }
         }
       }
-      variants(first: 10) {
+      variants(first: 100) {
         edges {
           node {
-            id
-            title
-            price {
-              amount
-              currencyCode
-            }
-            availableForSale
-            selectedOptions {
-              name
-              value
-            }
+            ...ProductVariant
           }
         }
       }

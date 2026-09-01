@@ -43,6 +43,7 @@ function Index() {
           <div className="mt-8 flex justify-center gap-4">
             <Link
               to="/"
+              hash="products"
               className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
             >
               Shop Now
@@ -51,7 +52,7 @@ function Index() {
         </div>
       </section>
 
-      <section className="px-4 pb-16 md:pb-24">
+      <section id="products" className="px-4 pb-16 md:pb-24">
         <div className="mx-auto max-w-7xl">
           <h2 className="text-2xl font-bold tracking-tight mb-8">Featured Products</h2>
           {products && products.length > 0 ? (
