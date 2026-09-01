@@ -370,43 +370,45 @@ function ProductDetailPage() {
               )}
             </div>
 
-            <div className="mt-6 space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="heat-level" className="text-sm font-medium">
-                  Heat level
-                </label>
-                <Select value={heatLevel} onValueChange={setHeatLevel}>
-                  <SelectTrigger id="heat-level" className="w-full md:w-72">
-                    <SelectValue placeholder="Choose a heat level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {heatLevels.map((level) => (
-                      <SelectItem key={level} value={level}>
-                        {level}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            {model.axisNames.length > 0 && (
+              <div className="mt-6 space-y-4">
+                {model.axisNames.map((axisName, axisIndex) => {
+                  const options = valuesForAxis(model, axisIndex, selection);
+                  const disabled =
+                    axisIndex > 0 && !selection[axisIndex - 1];
+                  return (
+                    <div key={axisName} className="space-y-2">
+                      <label htmlFor={`axis-${axisIndex}`} className="text-sm font-medium">
+                        {axisName}
+                      </label>
+                      <Select
+                        value={selection[axisIndex] ?? ""}
+                        onValueChange={(value) => handleAxisChange(axisIndex, value)}
+                        disabled={disabled}
+                      >
+                        <SelectTrigger id={`axis-${axisIndex}`} className="w-full md:w-72">
+                          <SelectValue
+                            placeholder={
+                              disabled
+                                ? `Pick a ${model.axisNames[axisIndex - 1]?.toLowerCase()} first`
+                                : `Choose a ${axisName.toLowerCase()}`
+                            }
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {options.map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  );
+                })}
               </div>
+            )}
 
-              <div className="space-y-2">
-                <label htmlFor="style" className="text-sm font-medium">
-                  Style
-                </label>
-                <Select value={style} onValueChange={setStyle} disabled={!heatLevel}>
-                  <SelectTrigger id="style" className="w-full md:w-72">
-                    <SelectValue placeholder={heatLevel ? "Choose a style" : "Pick a heat level first"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(stylesByHeatLevel[heatLevel] ?? []).map((s) => (
-                      <SelectItem key={s} value={s}>
-                        {s}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
               <QuantityStepper quantity={quantity} onChange={setQuantity} />
