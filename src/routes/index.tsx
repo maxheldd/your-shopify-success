@@ -52,7 +52,7 @@ function Index() {
         </div>
       </section>
 
-      <section className="px-4 pb-16 md:pb-24">
+      <section id="products" className="px-4 pb-16 md:pb-24">
         <div className="mx-auto max-w-7xl">
           <h2 className="text-2xl font-bold tracking-tight mb-8">Featured Products</h2>
           {products && products.length > 0 ? (
