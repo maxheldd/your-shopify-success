@@ -43,6 +43,7 @@ function Index() {
           <div className="mt-8 flex justify-center gap-4">
             <Link
               to="/"
+              hash="products"
               className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
             >
               Shop Now
