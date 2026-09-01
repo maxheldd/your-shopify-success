@@ -33,16 +33,6 @@ import { cn } from "@/lib/utils";
 import { buildVariantModel, findVariant, valuesForAxis } from "@/lib/variantOptions";
 
 export const Route = createFileRoute("/product/$handle")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `${params.handle} | Caesar Products` },
-      { name: "description", content: "Shop products at Caesar Products" },
-      { property: "og:title", content: `${params.handle} | Caesar Products` },
-      { property: "og:description", content: "Shop products at Caesar Products" },
-      { property: "og:type", content: "product" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
   loader: async ({ params, context }) => {
     const product = await context.queryClient.ensureQueryData({
       queryKey: ["product", params.handle],
@@ -51,6 +41,39 @@ export const Route = createFileRoute("/product/$handle")({
     if (!product) throw notFound();
     return { product };
   },
+  head: ({ loaderData }) => {
+    const product = loaderData?.product;
+    if (!product) {
+      return {
+        meta: [
+          { title: "Product unavailable | Caesar Products" },
+          { name: "robots", content: "noindex" },
+        ],
+      };
+    }
+    const title = `${product.title} | Caesar Products`;
+    const description =
+      product.description?.replace(/\s+/g, " ").trim().slice(0, 155) ||
+      "Shop premium wellness and recovery gear at Caesar Products.";
+    const image = product.images?.edges?.[0]?.node?.url;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "product" },
+        { name: "twitter:card", content: "summary_large_image" },
+        ...(image
+          ? [
+              { property: "og:image", content: image },
+              { name: "twitter:image", content: image },
+            ]
+          : []),
+      ],
+    };
+  },
+
   component: ProductDetailPage,
   errorComponent: () => (
     <div className="flex min-h-screen items-center justify-center px-4">
