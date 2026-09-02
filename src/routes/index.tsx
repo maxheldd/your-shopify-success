@@ -5,6 +5,7 @@ import { HeroBanner } from "@/components/HeroBanner";
 import { getProducts, getProductByHandle } from "@/lib/shopify.functions";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Truck, ShieldCheck, RefreshCcw, Lock } from "lucide-react";
+import { StarRating, getReviewStats } from "@/components/ProductReviews";
 import type { ShopifyProduct } from "@/lib/shopify";
 
 const HERO_HANDLE = "electric-cordless-heated-ankle-guard-massager-for-right-left-foot-vibration-massage-wristband-ankle-joint-brace-relax-muscles";
@@ -111,6 +112,13 @@ function HeroProduct({ node }: { node: ShopifyProduct["node"] }) {
             <h1 className="mt-3 text-2xl font-semibold leading-[1.15] tracking-tight md:text-4xl lg:text-[2.5rem]">
               {node.title}
             </h1>
+
+            <div className="mt-3 flex items-center gap-2">
+              <StarRating rating={getReviewStats(node.handle).average} size="md" />
+              <span className="text-sm text-muted-foreground">
+                {getReviewStats(node.handle).average.toFixed(1)} ({getReviewStats(node.handle).total} reviews)
+              </span>
+            </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-2.5">
               <div className="flex items-baseline gap-2">

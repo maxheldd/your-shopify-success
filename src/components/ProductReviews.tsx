@@ -67,13 +67,19 @@ function hash(value: string) {
 
 /** Deterministic per-product review totals. The hero product always has the most. */
 export function getReviewStats(handle?: string) {
-  const total = !handle || handle === HERO_HANDLE ? 161 : 24 + (hash(handle) % 96);
+  const isHero = !handle || handle === HERO_HANDLE;
+  const total = isHero ? 161 : 24 + (hash(handle) % 96);
 
   const counts = BASE_SHARES.map((share) => Math.max(1, Math.round(total * share)));
   const drift = total - counts.reduce((sum, c) => sum + c, 0);
   counts[0] = Math.max(1, (counts[0] ?? 1) + drift);
 
   const distribution = counts.map((count, i) => ({ stars: 5 - i, count }));
+
+  if (isHero) {
+    return { distribution, total, average: 4.5 };
+  }
+
   const sum = distribution.reduce((acc, d) => acc + d.stars * d.count, 0);
   const realTotal = distribution.reduce((acc, d) => acc + d.count, 0);
 
