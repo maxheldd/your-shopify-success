@@ -47,7 +47,12 @@ function getHeroBullets(description: string) {
 
   return cleaned
     .split(/\r?\n|(?<=\.)\s+(?=[A-Z0-9])/)
-    .map((line) => line.replace(/^[•\-*\u2022]\s*/, "").trim())
+    .map((line) =>
+      line
+        .replace(/^[•\-*\u2022]\s*/, "")
+        .replace(/\s*[.\s]+[123]\s*$/, "")
+        .trim()
+    )
     .filter((line) => {
       if (line.length < 25 || line.length > 160) return false;
       if (/^(Age|Brand Name|High-concerned chemical|Is It a Soft Shell|Origin|Features):/i.test(line)) return false;
