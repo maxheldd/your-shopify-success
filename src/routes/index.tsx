@@ -3,7 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { ProductCard } from "@/components/ProductCard";
 import { getProducts, getProductByHandle } from "@/lib/shopify.functions";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Truck, ShieldCheck, RefreshCcw, Lock } from "lucide-react";
 import type { ShopifyProduct } from "@/lib/shopify";
 
 const HERO_HANDLE = "electric-cordless-heated-ankle-guard-massager-for-right-left-foot-vibration-massage-wristband-ankle-joint-brace-relax-muscles";
