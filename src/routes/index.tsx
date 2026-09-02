@@ -50,7 +50,7 @@ function getHeroBullets(description: string) {
     .map((line) =>
       line
         .replace(/^[•\-*\u2022]\s*/, "")
-        .replace(/\s*[.\s]+[123]\s*$/, "")
+        .replace(/\s*[.]\s*[123](?:\s*[.])?\s*$/, "")
         .trim()
     )
     .filter((line) => {
