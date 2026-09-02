@@ -21,8 +21,13 @@ function splitLines(text: string): string[] {
     .replace(/([A-Za-z])(?=CN\s*:)/g, "$1\n")
     // "…valueNext Label:" -> newline before the next label
     .replace(/([a-z0-9)\]%°"\u2103\u00b0])(?=[A-Z][a-z][A-Za-z /&+-]{0,27}\s*:)/g, "$1\n")
-    // numbered feature lists onto their own lines
+    // numbered feature lists onto their own lines (incl. "…done.2. Next")
+    .replace(/([.!?])\s*(\d{1,2}\.)\s*(?=[A-Z])/g, "$1\n$2 ")
     .replace(/\s(\d{1,2}\.)\s*(?=[A-Z])/g, "\n$1 ")
+    // one sentence per line
+    .replace(/([.!?])\s+(?=[A-Z])/g, "$1\n")
+    // rejoin unit fragments split by the source data ("1800m" + "Ah")
+    .replace(/\n(Ah|mAh|V|W|A)\b/g, "$1")
     .replace(/\r?\n/g, "\n")
     .split("\n")
     .map((line) => line.replace(/[ \t]{2,}/g, " ").trim())
