@@ -27,6 +27,7 @@ import { getProductByHandle } from "@/lib/shopify.functions";
 import { useCartStore } from "@/stores/cartStore";
 import { ProductGallery } from "@/components/ProductGallery";
 import { ProductAccordions } from "@/components/ProductAccordions";
+import { parseDescription } from "@/lib/sanitizeDescription";
 import { ProductReviews, StarRating, getReviewStats } from "@/components/ProductReviews";
 import { useInView } from "@/hooks/useInView";
 import { cn } from "@/lib/utils";
@@ -137,15 +138,16 @@ function getSpecsForHeatLevel(heatLevel: string) {
   ];
 }
 
-/** Turns a Shopify plain-text description into 3-5 scannable bullets. */
-function descriptionBullets(description: string): string[] {
-  return description
-    .split(/\r?\n|(?<=\.)\s+(?=[A-Z0-9])/)
-    .map((line) => line.replace(/^[•\-*\u2022]\s*/, "").trim())
-    .filter((line) => line.length > 25 && line.length < 220)
-    .slice(0, 5);
+/** Generic, product-agnostic selling points when Shopify has no prose copy. */
+function genericBullets(title: string): string[] {
+  const name = (title.split(/[,|\u2014-]/)[0] ?? "").trim().toLowerCase();
+  return [
+    `Everyday comfort and support from our ${name || "wellness essentials"} range.`,
+    "Lightweight, breathable build designed for all-day wear.",
+    "Unisex fit with easy sizing — see the size guide in the options above.",
+    "Backed by free shipping, 30-day returns, and a 1-year warranty.",
+  ];
 }
-
 
 function formatPrice(amount: string, currencyCode: string) {
   return `${currencyCode} ${parseFloat(amount).toFixed(2)}`;
@@ -339,7 +341,16 @@ function ProductDetailPage() {
 
   const heatLevel = model.axisNames[0] === "Heat level" ? (selection[0] ?? "") : "";
   const reviewStats = useMemo(() => getReviewStats(handle), [handle]);
-  const bullets = useMemo(() => descriptionBullets(product.description ?? ""), [product.description]);
+  const parsed = useMemo(() => parseDescription(product.description ?? ""), [product.description]);
+  const bullets = useMemo(
+    () => (parsed.bullets.length ? parsed.bullets : genericBullets(product.title)),
+    [parsed.bullets, product.title],
+  );
+  const specs = useMemo(() => {
+    const heatSpecs = getSpecsForHeatLevel(heatLevel);
+    if (heatSpecs.length) return heatSpecs;
+    return parsed.specs;
+  }, [heatLevel, parsed.specs]);
   const selectedVariantName = selectedVariant
     ? selection.filter(Boolean).join(" — ") || selectedVariant.title
     : "Select options";
@@ -464,7 +475,7 @@ function ProductDetailPage() {
             <TrustRow />
 
             <FadeIn delay={100} className="mt-10">
-              <ProductAccordions specs={getSpecsForHeatLevel(heatLevel)} bullets={bullets} />
+              <ProductAccordions specs={specs} bullets={bullets} />
             </FadeIn>
           </div>
         </div>

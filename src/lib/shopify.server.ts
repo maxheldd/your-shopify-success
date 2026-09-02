@@ -1,4 +1,5 @@
 import { SHOPIFY_API_VERSION, SHOPIFY_STORE_DOMAIN, type ShopifyProduct } from "./shopify";
+import { sanitizeDescription, sanitizeOriginText } from "./sanitizeDescription";
 
 const SHOPIFY_STOREFRONT_URL = `https://${SHOPIFY_STORE_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;
 
@@ -233,14 +234,47 @@ const CART_QUERY = `
   }
 `;
 
+type ProductNode = ShopifyProduct["node"];
+
+/** Replace China origin wording in descriptions, options and variant labels. */
+function sanitizeProduct(product: ProductNode): ProductNode {
+  return {
+    ...product,
+    description: sanitizeDescription(product.description),
+    options: product.options?.map((option) => ({
+      ...option,
+      values: option.values?.map(sanitizeOriginText) ?? option.values,
+    })),
+    variants: product.variants
+      ? {
+          ...product.variants,
+          edges: product.variants.edges.map((edge) => ({
+            ...edge,
+            node: {
+              ...edge.node,
+              title: sanitizeOriginText(edge.node.title),
+              selectedOptions: edge.node.selectedOptions?.map((option) => ({
+                ...option,
+                value: sanitizeOriginText(option.value),
+              })),
+            },
+          })),
+        }
+      : product.variants,
+  };
+}
+
 export async function fetchProducts(first: number, query?: string): Promise<ShopifyProduct[]> {
   const data = await storefrontApiRequest(PRODUCTS_QUERY, { first, query: query ?? null });
-  return data?.data?.products?.edges ?? [];
+  const edges: ShopifyProduct[] = data?.data?.products?.edges ?? [];
+  return edges.map((edge) => ({ ...edge, node: sanitizeProduct(edge.node) }));
 }
 
 export async function fetchProductByHandle(handle: string): Promise<ShopifyProduct["node"] | null> {
   const data = await storefrontApiRequest(PRODUCT_BY_HANDLE_QUERY, { handle });
-  return data?.data?.product ?? null;
+  const product = data?.data?.product;
+  if (!product) return null;
+  return sanitizeProduct(product);
 }
 
 function formatCheckoutUrl(checkoutUrl: string): string {
