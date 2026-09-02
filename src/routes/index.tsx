@@ -113,6 +113,13 @@ function HeroProduct({ node }: { node: ShopifyProduct["node"] }) {
               {node.title}
             </h1>
 
+            <div className="mt-3 flex items-center gap-2">
+              <StarRating rating={getReviewStats(node.handle).average} size="md" />
+              <span className="text-sm text-muted-foreground">
+                {getReviewStats(node.handle).average.toFixed(1)} ({getReviewStats(node.handle).total} reviews)
+              </span>
+            </div>
+
             <div className="mt-4 flex flex-wrap items-center gap-2.5">
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-semibold md:text-3xl">
