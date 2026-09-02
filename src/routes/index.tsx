@@ -3,7 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { ProductCard } from "@/components/ProductCard";
 import { getProducts, getProductByHandle } from "@/lib/shopify.functions";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Truck, ShieldCheck, RefreshCcw, Lock } from "lucide-react";
 import type { ShopifyProduct } from "@/lib/shopify";
 
 const HERO_HANDLE = "electric-cordless-heated-ankle-guard-massager-for-right-left-foot-vibration-massage-wristband-ankle-joint-brace-relax-muscles";
@@ -39,9 +39,37 @@ function formatPrice(amount: string, currencyCode: string) {
   return `${currencyCode} ${parseFloat(amount).toFixed(2)}`;
 }
 
+function getHeroBullets(description: string) {
+  const cleaned = description
+    .replace(/SPECIFICATIONS/gi, "")
+    .replace(/([a-z])([A-Z])/g, "$1. $2")
+    .replace(/(Age:|Brand Name:|High-concerned chemical:|Is It a Soft Shell:|Origin:|Features:)/gi, ". $1");
+
+  return cleaned
+    .split(/\r?\n|(?<=\.)\s+(?=[A-Z0-9])/)
+    .map((line) =>
+      line
+        .replace(/^[•\-*\u2022]\s*/, "")
+        .replace(/\s*[.]\s*[123](?:\s*[.])?\s*$/, "")
+        .trim()
+    )
+    .filter((line) => {
+      if (line.length < 25 || line.length > 160) return false;
+      if (/^(Age|Brand Name|High-concerned chemical|Is It a Soft Shell|Origin|Features):/i.test(line)) return false;
+      if (!line.includes(" ")) return false;
+      return true;
+    })
+    .slice(0, 3);
+}
+
+const trustItems = [
+  { icon: Truck, label: "Free shipping" },
+  { icon: RefreshCcw, label: "30-day returns" },
+  { icon: ShieldCheck, label: "1-year warranty" },
+  { icon: Lock, label: "Secure checkout" },
+];
+
 function HeroProduct({ node }: { node: ShopifyProduct["node"] }) {
-
-
   const image = node.images.edges[0]?.node;
   const variant = node.variants.edges[0]?.node;
   const price = variant?.price ?? node.priceRange.minVariantPrice;
@@ -49,65 +77,70 @@ function HeroProduct({ node }: { node: ShopifyProduct["node"] }) {
   const compareAmount = compareAt?.amount ? parseFloat(compareAt.amount) : 0;
   const saleAmount = parseFloat(price.amount);
   const showCompare = compareAmount > saleAmount;
+  const savings = showCompare ? Math.round((1 - saleAmount / compareAmount) * 100) : 0;
 
-
-  const bullets = node.description
-    .split(/\r?\n|(?<=\.)\s+(?=[A-Z0-9])/)
-    .map((line) => line.replace(/^[•\-*\u2022]\s*/, "").trim())
-    .filter((line) => line.length > 15 && line.length < 220)
-    .slice(0, 4);
+  const bullets = getHeroBullets(node.description);
 
   return (
-    <section className="px-4 py-12 md:py-20">
-      <div className="mx-auto max-w-7xl">
-        <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+    <section className="px-4 py-8 md:py-12 lg:py-16">
+      <div className="mx-auto max-w-6xl">
+        <div className="grid items-center gap-6 lg:grid-cols-2 lg:gap-12">
           <Link
             to="/product/$handle"
             params={{ handle: node.handle }}
-            className="group relative order-1 overflow-hidden rounded-2xl bg-muted lg:order-1"
+            className="group relative order-1 overflow-hidden rounded-2xl border border-border bg-muted/50 lg:order-1"
           >
             {image ? (
               <img
                 src={image.url}
                 alt={image.altText ?? node.title}
-                className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                className="aspect-[4/5] max-h-[320px] w-full object-cover transition-transform duration-500 group-hover:scale-105 md:max-h-[420px] lg:max-h-[460px]"
               />
             ) : (
-              <div className="flex aspect-[4/3] w-full items-center justify-center text-muted-foreground">
+              <div className="flex aspect-[4/5] max-h-[320px] w-full items-center justify-center text-muted-foreground md:max-h-[420px] lg:max-h-[460px]">
                 No image
               </div>
             )}
           </Link>
 
           <div className="order-2 flex flex-col justify-center lg:order-2">
-            <span className="text-sm font-medium text-primary">Featured</span>
-            <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-5xl lg:text-6xl">
+            <span className="inline-flex w-fit items-center rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
+              Featured
+            </span>
+            <h1 className="mt-3 text-2xl font-semibold leading-[1.15] tracking-tight md:text-4xl lg:text-[2.5rem]">
               {node.title}
             </h1>
-            <div className="mt-4 flex items-baseline gap-3">
-              <p className="text-2xl font-semibold md:text-3xl">
-                {formatPrice(price.amount, price.currencyCode)}
-              </p>
-            {showCompare && compareAt && (
-                <p className="text-lg text-muted-foreground line-through">
-                  {formatPrice(compareAt.amount, compareAt.currencyCode)}
-                </p>
-              )}
 
+            <div className="mt-4 flex flex-wrap items-center gap-2.5">
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-semibold md:text-3xl">
+                  {formatPrice(price.amount, price.currencyCode)}
+                </span>
+                {showCompare && compareAt && (
+                  <span className="text-base text-muted-foreground line-through">
+                    {formatPrice(compareAt.amount, compareAt.currencyCode)}
+                  </span>
+                )}
+              </div>
+              {savings > 0 && (
+                <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                  Save {savings}%
+                </span>
+              )}
             </div>
 
             {bullets.length > 0 && (
-              <ul className="mt-6 space-y-2 text-muted-foreground">
+              <ul className="mt-5 space-y-2 text-sm text-muted-foreground md:text-base">
                 {bullets.map((bullet, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    <span>{bullet}</span>
+                  <li key={i} className="flex items-start gap-2.5">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                    <span className="leading-relaxed">{bullet}</span>
                   </li>
                 ))}
               </ul>
             )}
 
-            <div className="mt-8 flex flex-wrap items-center gap-4">
+            <div className="mt-6 flex flex-wrap items-center gap-3">
               <Button asChild size="lg" className="gap-2">
                 <Link to="/product/$handle" params={{ handle: node.handle }}>
                   Shop Now
@@ -119,6 +152,15 @@ function HeroProduct({ node }: { node: ShopifyProduct["node"] }) {
                   View All Products
                 </Link>
               </Button>
+            </div>
+
+            <div className="mt-6 grid grid-cols-2 gap-3 border-t border-border pt-5 sm:grid-cols-4">
+              {trustItems.map(({ icon: Icon, label }) => (
+                <div key={label} className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Icon className="h-4 w-4 shrink-0 text-primary" />
+                  <span>{label}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
