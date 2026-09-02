@@ -140,9 +140,15 @@ function getSpecsForHeatLevel(heatLevel: string) {
 
 /** Generic, product-agnostic selling points when Shopify has no prose copy. */
 function genericBullets(title: string): string[] {
-  const name = (title.split(/[,|\u2014-]/)[0] ?? "").trim().toLowerCase();
+  const name = (title.split(/[,|\u2014]/)[0] ?? "")
+    .replace(/^\d+\s*(pair|pcs?|pack)s?\b/i, "")
+    .trim()
+    .split(/\s+/)
+    .slice(0, 4)
+    .join(" ")
+    .toLowerCase();
   return [
-    `Everyday comfort and support from our ${name || "wellness essentials"} range.`,
+    `Everyday comfort and support from our ${name || "wellness"} range.`,
     "Lightweight, breathable build designed for all-day wear.",
     "Unisex fit with easy sizing — see the size guide in the options above.",
     "Backed by free shipping, 30-day returns, and a 1-year warranty.",
