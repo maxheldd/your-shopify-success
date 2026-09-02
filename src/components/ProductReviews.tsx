@@ -54,16 +54,35 @@ const REVIEWS: Review[] = [
   },
 ];
 
-const DISTRIBUTION = [
-  { stars: 5, count: 98 },
-  { stars: 4, count: 38 },
-  { stars: 3, count: 15 },
-  { stars: 2, count: 6 },
-  { stars: 1, count: 4 },
-];
+const BASE_SHARES = [0.61, 0.235, 0.093, 0.037, 0.025];
 
-const AVERAGE = 4.5;
-const TOTAL = DISTRIBUTION.reduce((sum, d) => sum + d.count, 0);
+const HERO_HANDLE =
+  "electric-cordless-heated-ankle-guard-massager-for-right-left-foot-vibration-massage-wristband-ankle-joint-brace-relax-muscles";
+
+function hash(value: string) {
+  let h = 0;
+  for (let i = 0; i < value.length; i++) h = (h * 31 + value.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+/** Deterministic per-product review totals. The hero product always has the most. */
+export function getReviewStats(handle?: string) {
+  const total = !handle || handle === HERO_HANDLE ? 161 : 24 + (hash(handle) % 96);
+
+  const counts = BASE_SHARES.map((share) => Math.max(1, Math.round(total * share)));
+  const drift = total - counts.reduce((sum, c) => sum + c, 0);
+  counts[0] = Math.max(1, (counts[0] ?? 1) + drift);
+
+  const distribution = counts.map((count, i) => ({ stars: 5 - i, count }));
+  const sum = distribution.reduce((acc, d) => acc + d.stars * d.count, 0);
+  const realTotal = distribution.reduce((acc, d) => acc + d.count, 0);
+
+  return {
+    distribution,
+    total: realTotal,
+    average: Math.round((sum / realTotal) * 10) / 10,
+  };
+}
 
 function StarRating({ rating, size = "sm" }: { rating: number; size?: "sm" | "md" | "lg" }) {
   const sizeClass = size === "lg" ? "h-5 w-5" : size === "md" ? "h-4 w-4" : "h-3.5 w-3.5";
@@ -82,7 +101,9 @@ function StarRating({ rating, size = "sm" }: { rating: number; size?: "sm" | "md
   );
 }
 
-export function ProductReviews() {
+export function ProductReviews({ handle }: { handle?: string }) {
+  const { distribution: DISTRIBUTION, total: TOTAL, average: AVERAGE } = getReviewStats(handle);
+
   return (
     <div className="space-y-8">
       <div className="grid gap-8 rounded-2xl border bg-card p-6 sm:grid-cols-2 sm:items-center">

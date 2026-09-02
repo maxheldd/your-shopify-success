@@ -27,7 +27,7 @@ import { getProductByHandle } from "@/lib/shopify.functions";
 import { useCartStore } from "@/stores/cartStore";
 import { ProductGallery } from "@/components/ProductGallery";
 import { ProductAccordions } from "@/components/ProductAccordions";
-import { ProductReviews, StarRating } from "@/components/ProductReviews";
+import { ProductReviews, StarRating, getReviewStats } from "@/components/ProductReviews";
 import { useInView } from "@/hooks/useInView";
 import { cn } from "@/lib/utils";
 import { buildVariantModel, findVariant, valuesForAxis } from "@/lib/variantOptions";
@@ -338,6 +338,7 @@ function ProductDetailPage() {
   const savingsPercent = compareAtAmount > 0 ? Math.round((savings / compareAtAmount) * 100) : 0;
 
   const heatLevel = model.axisNames[0] === "Heat level" ? (selection[0] ?? "") : "";
+  const reviewStats = useMemo(() => getReviewStats(handle), [handle]);
   const bullets = useMemo(() => descriptionBullets(product.description ?? ""), [product.description]);
   const selectedVariantName = selectedVariant
     ? selection.filter(Boolean).join(" — ") || selectedVariant.title
@@ -375,8 +376,8 @@ function ProductDetailPage() {
               href="#reviews"
               className="mt-3 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
             >
-              <StarRating rating={4.5} />
-              <span className="underline-offset-2 hover:underline">161 reviews</span>
+              <StarRating rating={reviewStats.average} />
+              <span className="underline-offset-2 hover:underline">{reviewStats.total} reviews</span>
             </a>
 
             <div className="mt-4 flex flex-wrap items-baseline gap-3">
@@ -474,7 +475,7 @@ function ProductDetailPage() {
           <section id="reviews" className="mt-20 scroll-mt-20">
             <h2 className="text-2xl font-bold tracking-tight">Customer reviews</h2>
             <div className="mt-6">
-              <ProductReviews />
+              <ProductReviews handle={handle} />
             </div>
           </section>
         </FadeIn>
