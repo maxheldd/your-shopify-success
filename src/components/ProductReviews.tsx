@@ -101,7 +101,9 @@ function StarRating({ rating, size = "sm" }: { rating: number; size?: "sm" | "md
   );
 }
 
-export function ProductReviews() {
+export function ProductReviews({ handle }: { handle?: string }) {
+  const { distribution: DISTRIBUTION, total: TOTAL, average: AVERAGE } = getReviewStats(handle);
+
   return (
     <div className="space-y-8">
       <div className="grid gap-8 rounded-2xl border bg-card p-6 sm:grid-cols-2 sm:items-center">
