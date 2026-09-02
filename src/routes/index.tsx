@@ -39,8 +39,8 @@ function formatPrice(amount: string, currencyCode: string) {
   return `${currencyCode} ${parseFloat(amount).toFixed(2)}`;
 }
 
-function HeroProduct({ product }: { product: ShopifyProduct }) {
-  const { node } = product;
+function HeroProduct({ node }: { node: ShopifyProduct["node"] }) {
+
 
   const image = node.images.edges[0]?.node;
   const variant = node.variants.edges[0]?.node;
@@ -143,7 +143,8 @@ function Index() {
 
   return (
     <main className="min-h-screen">
-      {heroProduct && <HeroProduct product={heroProduct} />}
+      {heroProduct && <HeroProduct node={heroProduct} />}
+
 
       <section id="products" className="px-4 pb-16 md:pb-24">
         <div className="mx-auto max-w-7xl">
