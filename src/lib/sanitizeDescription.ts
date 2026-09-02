@@ -137,9 +137,13 @@ export function parseDescription(description: string | null | undefined): {
     if (!line) continue;
 
     const match = line.match(/^([A-Za-z][A-Za-z0-9 /&+-]{1,28}):\s*(.+)$/);
-    if (match && (match[2] ?? "").length <= 80) {
+    if (match && (match[2] ?? "").length <= 100) {
       const label = (match[1] ?? "").trim();
-      const value = (match[2] ?? "").trim().replace(/[,;]\s*$/, "");
+      // a value can carry a second label glued onto it ("XBL-8688BProduct material: ABS")
+      let value = (match[2] ?? "").trim().replace(/[,;]\s*$/, "");
+      const glued = value.match(/^(.*?)([A-Z][a-z][A-Za-z /&+-]{0,27}):\s*(.+)$/);
+      if (glued && (glued[1] ?? "").length > 0) value = (glued[1] ?? "").trim();
+      if (value.length > 80) continue;
       const key = label.toLowerCase();
       if (NOISE_LABELS.includes(key)) continue;
       if (!value || value.toLowerCase() === "none" || value.toLowerCase() === "no") continue;
@@ -151,7 +155,8 @@ export function parseDescription(description: string | null | undefined): {
     }
 
     const prose = line.replace(/^\d{1,2}\.\s*/, "").trim();
-    if (prose.length > 30 && prose.length < 260 && /\s/.test(prose) && !/^[A-Z\s]+$/.test(prose)) {
+    const colonCount = (prose.match(/:/g) ?? []).length;
+    if (colonCount < 2 && prose.length > 30 && prose.length < 260 && /\s/.test(prose) && !/^[A-Z\s]+$/.test(prose)) {
       bullets.push(prose);
     }
   }
