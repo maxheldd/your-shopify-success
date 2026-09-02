@@ -40,14 +40,16 @@ function formatPrice(amount: string, currencyCode: string) {
 }
 
 function HeroProduct({ product }: { product: ShopifyProduct }) {
-  const node = product.node;
+  const { node } = product;
+
   const image = node.images.edges[0]?.node;
   const variant = node.variants.edges[0]?.node;
   const price = variant?.price ?? node.priceRange.minVariantPrice;
   const compareAt = variant?.compareAtPrice;
-  const compareAmount = compareAt ? parseFloat(compareAt.amount) : 0;
+  const compareAmount = compareAt?.amount ? parseFloat(compareAt.amount) : 0;
   const saleAmount = parseFloat(price.amount);
   const showCompare = compareAmount > saleAmount;
+
 
   const bullets = node.description
     .split(/\r?\n|(?<=\.)\s+(?=[A-Z0-9])/)
@@ -86,11 +88,12 @@ function HeroProduct({ product }: { product: ShopifyProduct }) {
               <p className="text-2xl font-semibold md:text-3xl">
                 {formatPrice(price.amount, price.currencyCode)}
               </p>
-              {showCompare && (
+            {showCompare && compareAt && (
                 <p className="text-lg text-muted-foreground line-through">
                   {formatPrice(compareAt.amount, compareAt.currencyCode)}
                 </p>
               )}
+
             </div>
 
             {bullets.length > 0 && (
