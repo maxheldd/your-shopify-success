@@ -37,31 +37,14 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+import { parseDescription } from "@/lib/sanitizeDescription";
+
 function formatPrice(amount: string, currencyCode: string) {
   return `${currencyCode} ${parseFloat(amount).toFixed(2)}`;
 }
 
 function getHeroBullets(description: string) {
-  const cleaned = description
-    .replace(/SPECIFICATIONS/gi, "")
-    .replace(/([a-z])([A-Z])/g, "$1. $2")
-    .replace(/(Age:|Brand Name:|High-concerned chemical:|Is It a Soft Shell:|Origin:|Features:)/gi, ". $1");
-
-  return cleaned
-    .split(/\r?\n|(?<=\.)\s+(?=[A-Z0-9])/)
-    .map((line) =>
-      line
-        .replace(/^[•\-*\u2022]\s*/, "")
-        .replace(/\s*[.]\s*[123](?:\s*[.])?\s*$/, "")
-        .trim()
-    )
-    .filter((line) => {
-      if (line.length < 25 || line.length > 160) return false;
-      if (/^(Age|Brand Name|High-concerned chemical|Is It a Soft Shell|Origin|Features):/i.test(line)) return false;
-      if (!line.includes(" ")) return false;
-      return true;
-    })
-    .slice(0, 3);
+  return parseDescription(description).bullets.slice(0, 3);
 }
 
 const trustItems = [
