@@ -375,8 +375,8 @@ function ProductDetailPage() {
               href="#reviews"
               className="mt-3 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
             >
-              <StarRating rating={4.5} />
-              <span className="underline-offset-2 hover:underline">161 reviews</span>
+              <StarRating rating={reviewStats.average} />
+              <span className="underline-offset-2 hover:underline">{reviewStats.total} reviews</span>
             </a>
 
             <div className="mt-4 flex flex-wrap items-baseline gap-3">
