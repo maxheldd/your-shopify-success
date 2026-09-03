@@ -80,14 +80,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Caesar Products" },
-      { name: "description", content: "Shop premium wellness products at Caesar Products" },
-      { name: "author", content: "Caesar Products" },
-      { property: "og:title", content: "Caesar Products" },
-      { property: "og:description", content: "Shop premium wellness products at Caesar Products" },
+      { title: "Caesar Goods" },
+      { name: "description", content: "Shop premium wellness products at Caesar Goods" },
+      { name: "author", content: "Caesar Goods" },
+      { property: "og:title", content: "Caesar Goods" },
+      { property: "og:description", content: "Shop premium wellness products at Caesar Goods" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@CaesarProducts" },
+      { name: "twitter:site", content: "@CaesarGoods" },
     ],
     links: [
       {
@@ -108,7 +108,7 @@ function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <Link to="/" className="text-xl font-bold tracking-tight hover:text-primary">
-          Caesar Products
+          Caesar Goods
         </Link>
         <CartDrawer />
       </div>
