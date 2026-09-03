@@ -82,34 +82,32 @@ export function getReviewStats(handle?: string) {
   counts[0] = Math.max(1, (counts[0] ?? 1) + drift);
 
   const distribution = counts.map((count, i) => ({ stars: 5 - i, count }));
-
-  if (isHero) {
-    return { distribution, total, average: 4.5 };
-  }
-
-  const sum = distribution.reduce((acc, d) => acc + d.stars * d.count, 0);
   const realTotal = distribution.reduce((acc, d) => acc + d.count, 0);
 
-  return {
-    distribution,
-    total: realTotal,
-    average: Math.round((sum / realTotal) * 10) / 10,
-  };
+  // Every product displays the same 4.5 average rating.
+  return { distribution, total: isHero ? total : realTotal, average: 4.5 };
 }
 
 function StarRating({ rating, size = "sm" }: { rating: number; size?: "sm" | "md" | "lg" }) {
   const sizeClass = size === "lg" ? "h-5 w-5" : size === "md" ? "h-4 w-4" : "h-3.5 w-3.5";
   return (
     <div className="flex items-center gap-0.5" aria-label={`${rating} out of 5 stars`}>
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          className={cn(
-            sizeClass,
-            star <= Math.round(rating) ? "fill-amber-400 text-amber-400" : "fill-muted text-muted-foreground",
-          )}
-        />
-      ))}
+      {[1, 2, 3, 4, 5].map((star) => {
+        const fillPercent = Math.max(0, Math.min(1, rating - (star - 1))) * 100;
+        return (
+          <span key={star} className={cn("relative inline-block", sizeClass)}>
+            <Star className={cn(sizeClass, "absolute inset-0 fill-muted text-muted-foreground")} />
+            {fillPercent > 0 && (
+              <span
+                className="absolute inset-0 overflow-hidden"
+                style={{ width: `${fillPercent}%` }}
+              >
+                <Star className={cn(sizeClass, "fill-amber-400 text-amber-400")} />
+              </span>
+            )}
+          </span>
+        );
+      })}
     </div>
   );
 }
