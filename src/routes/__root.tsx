@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartDrawer } from "@/components/CartDrawer";
 import { useCartSync } from "@/hooks/useCartSync";
 import { Toaster } from "@/components/ui/sonner";
+import { metaPixelBaseCode } from "@/lib/fbq";
 
 function NotFoundComponent() {
   return (
