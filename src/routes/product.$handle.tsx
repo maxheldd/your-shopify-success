@@ -47,15 +47,15 @@ export const Route = createFileRoute("/product/$handle")({
     if (!product) {
       return {
         meta: [
-          { title: "Product unavailable | Caesar Products" },
+          { title: "Product unavailable | Caesar Goods" },
           { name: "robots", content: "noindex" },
         ],
       };
     }
-    const title = `${product.title} | Caesar Products`;
+    const title = `${product.title} | Caesar Goods`;
     const description =
       product.description?.replace(/\s+/g, " ").trim().slice(0, 155) ||
-      "Shop premium wellness and recovery gear at Caesar Products.";
+      "Shop premium wellness and recovery gear at Caesar Goods.";
     const image = product.images?.edges?.[0]?.node?.url;
     return {
       meta: [
