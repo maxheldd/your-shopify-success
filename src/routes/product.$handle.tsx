@@ -32,6 +32,7 @@ import { ProductReviews, StarRating, getReviewStats } from "@/components/Product
 import { useInView } from "@/hooks/useInView";
 import { cn } from "@/lib/utils";
 import { buildVariantModel, findVariant, valuesForAxis } from "@/lib/variantOptions";
+import { fbqTrack } from "@/lib/fbq";
 
 export const Route = createFileRoute("/product/$handle")({
   loader: async ({ params, context }) => {
@@ -317,12 +318,29 @@ function ProductDetailPage() {
     }
   }, [selectedVariant?.image?.url]);
 
+  useEffect(() => {
+    fbqTrack("ViewContent", {
+      content_ids: [product.id],
+      content_name: product.title,
+      content_type: "product",
+      value: parseFloat(product.priceRange.minVariantPrice.amount),
+      currency: product.priceRange.minVariantPrice.currencyCode,
+    });
+  }, [product.id, product.title, product.priceRange.minVariantPrice.amount, product.priceRange.minVariantPrice.currencyCode]);
+
   const addItem = useCartStore((state) => state.addItem);
   const isLoading = useCartStore((state) => state.isLoading);
   const checkoutUrl = useCartStore((state) => state.checkoutUrl);
 
   const handleAddToCart = async (goToCheckout = false) => {
     if (!selectedVariant) return;
+    fbqTrack("AddToCart", {
+      content_ids: [selectedVariant.id],
+      content_name: product.title,
+      content_type: "product",
+      value: parseFloat(selectedVariant.price.amount) * quantity,
+      currency: selectedVariant.price.currencyCode,
+    });
     await addItem({
       product: { node: product },
       variantId: selectedVariant.id,
@@ -331,8 +349,16 @@ function ProductDetailPage() {
       quantity,
       selectedOptions: selectedVariant.selectedOptions,
     });
-    if (goToCheckout && checkoutUrl) {
-      window.open(checkoutUrl, "_blank");
+    if (goToCheckout) {
+      fbqTrack("InitiateCheckout", {
+        content_ids: [selectedVariant.id],
+        content_name: product.title,
+        num_items: quantity,
+        value: parseFloat(selectedVariant.price.amount) * quantity,
+        currency: selectedVariant.price.currencyCode,
+      });
+      const url = useCartStore.getState().checkoutUrl ?? checkoutUrl;
+      if (url) window.open(url, "_blank");
     }
   };
 
