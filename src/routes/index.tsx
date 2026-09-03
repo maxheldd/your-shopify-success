@@ -13,10 +13,10 @@ const HERO_HANDLE = "electric-cordless-heated-ankle-guard-massager-for-right-lef
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Caesar Products" },
-      { name: "description", content: "Shop premium wellness products at Caesar Products" },
-      { property: "og:title", content: "Caesar Products" },
-      { property: "og:description", content: "Shop premium wellness products at Caesar Products" },
+      { title: "Caesar Goods" },
+      { name: "description", content: "Shop premium wellness products at Caesar Goods" },
+      { property: "og:title", content: "Caesar Goods" },
+      { property: "og:description", content: "Shop premium wellness products at Caesar Goods" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
