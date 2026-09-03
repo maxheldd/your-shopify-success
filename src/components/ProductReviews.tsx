@@ -40,9 +40,16 @@ const REVIEWS: Review[] = [
   },
   {
     name: "Alicia M.",
-    rating: 3,
+    rating: 4,
     date: "January 8, 2025",
-    body: "Works well on my wrist, but the ankle strap is a little snug over compression socks. Build quality is solid though, and customer service answered my sizing question quickly.",
+    body: "Works well on my wrist, but the strap is a little snug over compression socks. Build quality is solid though, and customer service answered my sizing question quickly.",
+    verified: true,
+  },
+  {
+    name: "Tony P.",
+    rating: 4,
+    date: "December 5, 2024",
+    body: "No complaints about how it works — warms up fast and feels great. Only nitpick is the carrying pouch is a bit flimsy compared to the product itself.",
     verified: true,
   },
   {
