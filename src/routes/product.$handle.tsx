@@ -408,7 +408,7 @@ function ProductDetailPage() {
             />
           </FadeIn>
 
-          <div className="flex flex-col">
+          <div className="flex min-w-0 flex-col">
             <Badge variant="secondary" className="w-fit mb-4">
               {product.vendor}
             </Badge>
