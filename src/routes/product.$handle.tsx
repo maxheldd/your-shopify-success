@@ -413,7 +413,9 @@ function ProductDetailPage() {
               {product.vendor}
             </Badge>
 
-            <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{product.title}</h1>
+            <h1 className="break-words text-2xl font-bold leading-tight tracking-tight sm:text-3xl md:text-4xl">
+              {product.title}
+            </h1>
 
             <a
               href="#reviews"
