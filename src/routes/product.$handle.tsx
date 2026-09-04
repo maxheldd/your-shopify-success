@@ -399,8 +399,8 @@ function ProductDetailPage() {
           Back to shop
         </Link>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:gap-12">
-          <FadeIn>
+        <div className="grid min-w-0 gap-8 md:grid-cols-2 lg:gap-12">
+          <FadeIn className="min-w-0">
             <ProductGallery
               images={images}
               alt={product.title}
@@ -408,12 +408,14 @@ function ProductDetailPage() {
             />
           </FadeIn>
 
-          <div className="flex flex-col">
+          <div className="flex min-w-0 flex-col">
             <Badge variant="secondary" className="w-fit mb-4">
               {product.vendor}
             </Badge>
 
-            <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{product.title}</h1>
+            <h1 className="break-words text-2xl font-bold leading-tight tracking-tight sm:text-3xl md:text-4xl">
+              {product.title}
+            </h1>
 
             <a
               href="#reviews"

@@ -18,7 +18,7 @@ export function ProductGallery({ images, alt, selectedImageUrl }: ProductGallery
   const mainImage = images[mainIndex];
 
   return (
-    <div className="space-y-4">
+    <div className="w-full min-w-0 space-y-4">
       <div className="aspect-square overflow-hidden rounded-2xl bg-muted">
         {mainImage ? (
           <img
@@ -32,7 +32,7 @@ export function ProductGallery({ images, alt, selectedImageUrl }: ProductGallery
       </div>
 
       {images.length > 1 && (
-        <div className="flex gap-3 overflow-x-auto pb-1">
+        <div className="flex w-full min-w-0 max-w-full gap-3 overflow-x-auto pb-1">
           {images.map((image, index) => (
             <button
               key={`${image.url}-${index}`}
