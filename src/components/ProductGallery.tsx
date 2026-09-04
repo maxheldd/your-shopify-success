@@ -18,7 +18,7 @@ export function ProductGallery({ images, alt, selectedImageUrl }: ProductGallery
   const mainImage = images[mainIndex];
 
   return (
-    <div className="space-y-4">
+    <div className="w-full min-w-0 space-y-4">
       <div className="aspect-square overflow-hidden rounded-2xl bg-muted">
         {mainImage ? (
           <img
