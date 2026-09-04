@@ -399,8 +399,8 @@ function ProductDetailPage() {
           Back to shop
         </Link>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:gap-12">
-          <FadeIn>
+        <div className="grid min-w-0 gap-8 md:grid-cols-2 lg:gap-12">
+          <FadeIn className="min-w-0">
             <ProductGallery
               images={images}
               alt={product.title}
