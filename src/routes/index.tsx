@@ -16,10 +16,10 @@ const VISIBLE_HANDLES = [HERO_HANDLE];
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Caesar Goods" },
-      { name: "description", content: "Shop premium wellness products at Caesar Goods" },
-      { property: "og:title", content: "Caesar Goods" },
-      { property: "og:description", content: "Shop premium wellness products at Caesar Goods" },
+      { title: "Caesar Goods — 360° Travel Neck Pillow" },
+      { name: "description", content: "The 360-degree U-shaped travel neck pillow for flights, commutes and office naps. Free shipping and 30-day returns." },
+      { property: "og:title", content: "Caesar Goods — 360° Travel Neck Pillow" },
+      { property: "og:description", content: "The 360-degree U-shaped travel neck pillow for flights, commutes and office naps. Free shipping and 30-day returns." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
