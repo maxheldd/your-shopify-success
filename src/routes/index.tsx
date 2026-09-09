@@ -8,15 +8,18 @@ import { ArrowRight, Truck, ShieldCheck, RefreshCcw, Lock } from "lucide-react";
 import { StarRating, getReviewStats } from "@/components/ProductReviews";
 import type { ShopifyProduct } from "@/lib/shopify";
 
-const HERO_HANDLE = "electric-cordless-heated-ankle-guard-massager-for-right-left-foot-vibration-massage-wristband-ankle-joint-brace-relax-muscles";
+const HERO_HANDLE = "c0q-travel-neck-pillow-360-degree-support-for-office-nap-airplane-flight-comfortable-portable-u-shape-neck-rest-1";
+
+/** Only these products are shown on the storefront. */
+const VISIBLE_HANDLES = [HERO_HANDLE];
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Caesar Goods" },
-      { name: "description", content: "Shop premium wellness products at Caesar Goods" },
-      { property: "og:title", content: "Caesar Goods" },
-      { property: "og:description", content: "Shop premium wellness products at Caesar Goods" },
+      { title: "Caesar Goods — 360° Travel Neck Pillow" },
+      { name: "description", content: "The 360-degree U-shaped travel neck pillow for flights, commutes and office naps. Free shipping and 30-day returns." },
+      { property: "og:title", content: "Caesar Goods — 360° Travel Neck Pillow" },
+      { property: "og:description", content: "The 360-degree U-shaped travel neck pillow for flights, commutes and office naps. Free shipping and 30-day returns." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -140,8 +143,8 @@ function HeroProduct({ node }: { node: ShopifyProduct["node"] }) {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link to="/" hash="products">
-                  View All Products
+                <Link to="/product/$handle" params={{ handle: node.handle }} hash="reviews">
+                  Read Reviews
                 </Link>
               </Button>
             </div>
@@ -172,7 +175,9 @@ function Index() {
   });
 
   const gridProducts = products?.filter(
-    (product) => product.node.handle !== HERO_HANDLE,
+    (product) =>
+      VISIBLE_HANDLES.includes(product.node.handle) &&
+      product.node.handle !== HERO_HANDLE,
   );
 
   return (
@@ -180,26 +185,18 @@ function Index() {
       <HeroBanner />
       {heroProduct && <HeroProduct node={heroProduct} />}
 
-
-      <section id="products" className="px-4 pb-16 md:pb-24">
-        <div className="mx-auto max-w-7xl">
-          <h2 className="text-2xl font-bold tracking-tight mb-8">Featured Products</h2>
-          {gridProducts && gridProducts.length > 0 ? (
+      {gridProducts && gridProducts.length > 0 && (
+        <section id="products" className="px-4 pb-16 md:pb-24">
+          <div className="mx-auto max-w-7xl">
+            <h2 className="text-2xl font-bold tracking-tight mb-8">Featured Products</h2>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {gridProducts.map((product) => (
                 <ProductCard key={product.node.id} product={product} />
               ))}
             </div>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-border p-12 text-center">
-              <p className="text-muted-foreground">No products found.</p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Tell me what product you want to add and I’ll create it in your Shopify store.
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
     </main>
   );
 }
