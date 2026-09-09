@@ -175,7 +175,9 @@ function Index() {
   });
 
   const gridProducts = products?.filter(
-    (product) => product.node.handle !== HERO_HANDLE,
+    (product) =>
+      VISIBLE_HANDLES.includes(product.node.handle) &&
+      product.node.handle !== HERO_HANDLE,
   );
 
   return (
@@ -183,26 +185,18 @@ function Index() {
       <HeroBanner />
       {heroProduct && <HeroProduct node={heroProduct} />}
 
-
-      <section id="products" className="px-4 pb-16 md:pb-24">
-        <div className="mx-auto max-w-7xl">
-          <h2 className="text-2xl font-bold tracking-tight mb-8">Featured Products</h2>
-          {gridProducts && gridProducts.length > 0 ? (
+      {gridProducts && gridProducts.length > 0 && (
+        <section id="products" className="px-4 pb-16 md:pb-24">
+          <div className="mx-auto max-w-7xl">
+            <h2 className="text-2xl font-bold tracking-tight mb-8">Featured Products</h2>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {gridProducts.map((product) => (
                 <ProductCard key={product.node.id} product={product} />
               ))}
             </div>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-border p-12 text-center">
-              <p className="text-muted-foreground">No products found.</p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Tell me what product you want to add and I’ll create it in your Shopify store.
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
     </main>
   );
 }
