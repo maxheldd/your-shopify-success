@@ -64,7 +64,7 @@ const REVIEWS: Review[] = [
 const BASE_SHARES = [0.61, 0.235, 0.093, 0.037, 0.025];
 
 const HERO_HANDLE =
-  "electric-cordless-heated-ankle-guard-massager-for-right-left-foot-vibration-massage-wristband-ankle-joint-brace-relax-muscles";
+  "c0q-travel-neck-pillow-360-degree-support-for-office-nap-airplane-flight-comfortable-portable-u-shape-neck-rest-1";
 
 function hash(value: string) {
   let h = 0;

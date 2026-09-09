@@ -8,7 +8,10 @@ import { ArrowRight, Truck, ShieldCheck, RefreshCcw, Lock } from "lucide-react";
 import { StarRating, getReviewStats } from "@/components/ProductReviews";
 import type { ShopifyProduct } from "@/lib/shopify";
 
-const HERO_HANDLE = "electric-cordless-heated-ankle-guard-massager-for-right-left-foot-vibration-massage-wristband-ankle-joint-brace-relax-muscles";
+const HERO_HANDLE = "c0q-travel-neck-pillow-360-degree-support-for-office-nap-airplane-flight-comfortable-portable-u-shape-neck-rest-1";
+
+/** Only these products are shown on the storefront. */
+const VISIBLE_HANDLES = [HERO_HANDLE];
 
 export const Route = createFileRoute("/")({
   head: () => ({
