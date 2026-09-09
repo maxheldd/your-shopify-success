@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ProductCard } from "@/components/ProductCard";
-import { HeroBanner } from "@/components/HeroBanner";
 import { getProducts, getProductByHandle } from "@/lib/shopify.functions";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Truck, ShieldCheck, RefreshCcw, Lock } from "lucide-react";
@@ -182,7 +181,6 @@ function Index() {
 
   return (
     <main className="min-h-screen">
-      <HeroBanner />
       {heroProduct && <HeroProduct node={heroProduct} />}
 
       {gridProducts && gridProducts.length > 0 && (
