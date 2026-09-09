@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -300,6 +301,8 @@ function StarRating({ rating, size = "sm" }: { rating: number; size?: "sm" | "md
 
 export function ProductReviews({ handle }: { handle?: string }) {
   const { distribution: DISTRIBUTION, total: TOTAL, average: AVERAGE } = getReviewStats(handle);
+  const [showAll, setShowAll] = useState(false);
+  const visibleReviews = showAll ? REVIEWS : REVIEWS.slice(0, 8);
 
   return (
     <div className="space-y-8">
@@ -333,7 +336,7 @@ export function ProductReviews({ handle }: { handle?: string }) {
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2">
-        {REVIEWS.map((review, index) => (
+        {visibleReviews.map((review, index) => (
           <div
             key={index}
             className="rounded-2xl border bg-card p-5 transition-shadow duration-200 hover:shadow-sm"
@@ -359,6 +362,18 @@ export function ProductReviews({ handle }: { handle?: string }) {
           </div>
         ))}
       </div>
+
+      {REVIEWS.length > 8 && (
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => setShowAll((v) => !v)}
+            className="rounded-full border px-5 py-2 text-sm font-medium transition-colors hover:bg-secondary"
+          >
+            {showAll ? "Show fewer reviews" : `Show all ${REVIEWS.length} written reviews`}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
