@@ -143,8 +143,8 @@ function HeroProduct({ node }: { node: ShopifyProduct["node"] }) {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link to="/" hash="products">
-                  View All Products
+                <Link to="/product/$handle" params={{ handle: node.handle }} hash="reviews">
+                  Read Reviews
                 </Link>
               </Button>
             </div>
