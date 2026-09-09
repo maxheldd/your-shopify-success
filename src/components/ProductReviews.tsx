@@ -11,81 +11,267 @@ interface Review {
 
 const REVIEWS: Review[] = [
   {
-    name: "Margaret T.",
-    rating: 5,
-    date: "March 12, 2025",
-    body: "I stand all day at the pharmacy and my ankles were screaming by closing time. This has become part of my nightly wind-down — twenty minutes and the stiffness is gone.",
-    verified: true,
+    "name": "Verified Buyer",
+    "date": "14 Feb 2026",
+    "rating": 5,
+    "body": "Very soft but supportive memory foam . If you have a very large neck say over 18\" will be a little small. Compares very well to the very expensive octopus neck pillow, not quite the same quality but 10x cheaper so good value .",
+    "verified": true
   },
   {
-    name: "Derek L.",
-    rating: 5,
-    date: "February 28, 2025",
-    body: "Bought it for arthritis in my wrist. The heat gets warm fast and the vibration isn't loud or cheap-feeling. I can type the next morning without the usual ache.",
-    verified: true,
+    "name": "t***r",
+    "date": "22 Apr 2026",
+    "rating": 5,
+    "body": "Great product, seems well made, works well on different neck sizes, just a note have to remove the protective layer over one of the velcro sides, initially thought they had sewn in the wrong side up!",
+    "verified": true
   },
   {
-    name: "Sandra K.",
-    rating: 4,
-    date: "February 15, 2025",
-    body: "Great after runs. I use the ankle wrap after half-marathon training. Only wish the charge lasted a tiny bit longer on the highest setting.",
-    verified: true,
+    "name": "i***t",
+    "date": "26 Feb 2026",
+    "rating": 4,
+    "body": "Great pillow for flights or long trips Matches the image",
+    "verified": true
   },
   {
-    name: "James R.",
-    rating: 5,
-    date: "January 30, 2025",
-    body: "My physical therapist recommended heat therapy for plantar fasciitis. This let me do it at home while watching TV. Noticeable improvement in two weeks.",
-    verified: true,
+    "name": "Verified Buyer",
+    "date": "26 Apr 2026",
+    "rating": 5,
+    "body": "It's really comfortable for travel! I highly recommend it!",
+    "verified": true
   },
   {
-    name: "Alicia M.",
-    rating: 4,
-    date: "January 8, 2025",
-    body: "Works well on my wrist, but the strap is a little snug over compression socks. Build quality is solid though, and customer service answered my sizing question quickly.",
-    verified: true,
+    "name": "Verified Buyer",
+    "date": "22 Jan 2026",
+    "rating": 5,
+    "body": "A quality travel neck pillow.",
+    "verified": true
   },
   {
-    name: "Tony P.",
-    rating: 4,
-    date: "December 5, 2024",
-    body: "No complaints about how it works — warms up fast and feels great. Only nitpick is the carrying pouch is a bit flimsy compared to the product itself.",
-    verified: true,
+    "name": "J***e",
+    "date": "26 Dec 2025",
+    "rating": 5,
+    "body": "Very comfortable and firm. Almost a collar. High-quality velcro closure",
+    "verified": true
   },
   {
-    name: "Robert H.",
-    rating: 5,
-    date: "December 22, 2024",
-    body: "Got the red-light version for my wife's ankle stiffness. She uses it every evening and says the warmth plus light is more soothing than a heating pad alone.",
-    verified: true,
+    "name": "Verified Buyer",
+    "date": "09 Feb 2026",
+    "rating": 5,
+    "body": "It's beautiful, I recommend it, fast shipping.",
+    "verified": true
   },
+  {
+    "name": "2***r",
+    "date": "13 Feb 2026",
+    "rating": 5,
+    "body": "Very good product, matches the description, ultra-fast delivery.",
+    "verified": true
+  },
+  {
+    "name": "c***j",
+    "date": "26 Dec 2025",
+    "rating": 5,
+    "body": "Good product, fast delivery+++++",
+    "verified": true
+  },
+  {
+    "name": "É***n",
+    "date": "05 Mar 2026",
+    "rating": 5,
+    "body": "Comfortable, true to the description",
+    "verified": true
+  },
+  {
+    "name": "Verified Buyer",
+    "date": "16 Feb 2026",
+    "rating": 5,
+    "body": "They seem very comfortable, they fit perfectly.",
+    "verified": true
+  },
+  {
+    "name": "Verified Buyer",
+    "date": "03 Feb 2026",
+    "rating": 5,
+    "body": "Excellent! Very satisfied.",
+    "verified": true
+  },
+  {
+    "name": "Verified Buyer",
+    "date": "24 Feb 2026",
+    "rating": 5,
+    "body": "comfortable top",
+    "verified": true
+  },
+  {
+    "name": "N***V",
+    "date": "13 Feb 2026",
+    "rating": 5,
+    "body": "It fits well",
+    "verified": true
+  },
+  {
+    "name": "c***y",
+    "date": "28 Apr 2026",
+    "rating": 5,
+    "body": "That's great 👍🏻",
+    "verified": true
+  },
+  {
+    "name": "Verified Buyer",
+    "date": "12 Apr 2026",
+    "rating": 5,
+    "body": "Good",
+    "verified": true
+  },
+  {
+    "name": "Verified Buyer",
+    "date": "26 Mar 2026",
+    "rating": 4,
+    "body": "superb product",
+    "verified": true
+  },
+  {
+    "name": "Verified Buyer",
+    "date": "24 Feb 2026",
+    "rating": 5,
+    "body": "Seems really comfy, but not used on a long journey yet",
+    "verified": true
+  },
+  {
+    "name": "R***f",
+    "date": "03 Apr 2026",
+    "rating": 5,
+    "body": "Super",
+    "verified": true
+  },
+  {
+    "name": "Verified Buyer",
+    "date": "20 Mar 2026",
+    "rating": 5,
+    "body": "👍🏻",
+    "verified": true
+  },
+  {
+    "name": "Verified Buyer",
+    "date": "20 Feb 2026",
+    "rating": 4,
+    "body": "The price-quality ratio is okay. I don't know yet if it will really work. The inflatable version takes up less space when traveling.",
+    "verified": true
+  },
+  {
+    "name": "t***t",
+    "date": "12 Feb 2026",
+    "rating": 3,
+    "body": "The image shows that one side of the neck pillow is higher to provide more support, but the product I received has both sides low and does not provide enough support. It's a shame, you get what you pay for!",
+    "verified": true
+  },
+  {
+    "name": "Verified Buyer",
+    "date": "29 Mar 2026",
+    "rating": 3,
+    "body": "The velcrow closing is not very strong every time i mive my nek a bit it breaks open. But it is soft",
+    "verified": true
+  },
+  {
+    "name": "Verified Buyer",
+    "date": "02 Feb 2026",
+    "rating": 1,
+    "body": "Wrong colour and also same 12cm height on left and right sides - not 16cm as stated in the description!",
+    "verified": true
+  },
+  {
+    "name": "Verified Buyer",
+    "date": "19 Feb 2026",
+    "rating": 1,
+    "body": "The description is incorrect; it says that one side is higher than the other, but both sides are the same, about 12cm each. It does not have the 16cm side as advertised.",
+    "verified": true
+  },
+  {
+    "name": "E***l",
+    "date": "26 Jul 2026",
+    "rating": 5,
+    "body": "Perfected as described can’t wait to use",
+    "verified": true
+  },
+  {
+    "name": "Verified Buyer",
+    "date": "21 Jul 2026",
+    "rating": 5,
+    "body": "Looks fine",
+    "verified": true
+  },
+  {
+    "name": "F***i",
+    "date": "25 Aug 2026",
+    "rating": 5,
+    "body": "Comfortable, very good, I recommend it.",
+    "verified": true
+  },
+  {
+    "name": "L***o",
+    "date": "22 Aug 2026",
+    "rating": 5,
+    "body": "Nice product.",
+    "verified": true
+  },
+  {
+    "name": "Verified Buyer",
+    "date": "19 Aug 2026",
+    "rating": 5,
+    "body": "Excellent",
+    "verified": true
+  },
+  {
+    "name": "Verified Buyer",
+    "date": "11 Apr 2026",
+    "rating": 2,
+    "body": "Ordered and received stuff color and look is different.",
+    "verified": true
+  },
+  {
+    "name": "c***r",
+    "date": "25 Aug 2026",
+    "rating": 2,
+    "body": "The pillow itself is fine, but the zipper doesn't stay closed at all. I have not yet found a solution to resolve this issue before my departure. AND my mailbox was forced open to hold the package. Now it won't close anymore! ! ! While I had specifically stayed home to receive the package... What a disappointment!",
+    "verified": true
+  },
+  {
+    "name": "Verified Buyer",
+    "date": "16 Feb 2026",
+    "rating": 2,
+    "body": "No good support, welcro not ok",
+    "verified": true
+  },
+  {
+    "name": "A***z",
+    "date": "02 Aug 2026",
+    "rating": 2,
+    "body": "Comfortable but bulky",
+    "verified": true
+  },
+  {
+    "name": "R***o",
+    "date": "16 Jun 2026",
+    "rating": 1,
+    "body": "Uncomfortable",
+    "verified": true
+  }
 ];
 
-const BASE_SHARES = [0.61, 0.235, 0.093, 0.037, 0.025];
+const DISTRIBUTION = [
+  { stars: 5, count: 87 },
+  { stars: 4, count: 12 },
+  { stars: 3, count: 4 },
+  { stars: 2, count: 4 },
+  { stars: 1, count: 3 },
+];
 
-const HERO_HANDLE =
-  "c0q-travel-neck-pillow-360-degree-support-for-office-nap-airplane-flight-comfortable-portable-u-shape-neck-rest-1";
+const TOTAL = DISTRIBUTION.reduce((sum, row) => sum + row.count, 0);
+const AVERAGE =
+  DISTRIBUTION.reduce((sum, row) => sum + row.stars * row.count, 0) / TOTAL;
 
-function hash(value: string) {
-  let h = 0;
-  for (let i = 0; i < value.length; i++) h = (h * 31 + value.charCodeAt(i)) >>> 0;
-  return h;
-}
-
-/** Deterministic per-product review totals. The hero product always has the most. */
-export function getReviewStats(handle?: string) {
-  const isHero = !handle || handle === HERO_HANDLE;
-  const total = isHero ? 161 : 24 + (hash(handle) % 96);
-
-  const counts = BASE_SHARES.map((share) => Math.max(1, Math.round(total * share)));
-  const drift = total - counts.reduce((sum, c) => sum + c, 0);
-  counts[0] = Math.max(1, (counts[0] ?? 1) + drift);
-
-  const distribution = counts.map((count, i) => ({ stars: 5 - i, count }));
-  const realTotal = distribution.reduce((acc, d) => acc + d.count, 0);
-
-  // Every product displays the same 4.5 average rating.
-  return { distribution, total: isHero ? total : realTotal, average: 4.5 };
+/** Real review totals pulled from the product's collected reviews. */
+export function getReviewStats(_handle?: string) {
+  return { distribution: DISTRIBUTION, total: TOTAL, average: Math.round(AVERAGE * 10) / 10 };
 }
 
 function StarRating({ rating, size = "sm" }: { rating: number; size?: "sm" | "md" | "lg" }) {
