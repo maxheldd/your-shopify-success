@@ -57,6 +57,7 @@ function displayTitle(handle: string, title: string) {
 
 export const Route = createFileRoute("/product/$handle")({
   loader: async ({ params, context }) => {
+    if (params.handle !== SLEEP_MASK_HANDLE) throw notFound();
     const product = await context.queryClient.ensureQueryData({
       queryKey: ["product", params.handle],
       queryFn: () => getProductByHandle({ data: { handle: params.handle } }),
@@ -111,73 +112,6 @@ export const Route = createFileRoute("/product/$handle")({
     </div>
   ),
 });
-
-function getSpecsForHeatLevel(heatLevel: string) {
-  const base = {
-    "3 Level": {
-      battery: "2000 mAh lithium-ion",
-      chargeTime: "2.5 hours",
-      sessions: "4–6 sessions",
-      autoShutoff: "20 minutes",
-    },
-    "4 Level": {
-      battery: "2200 mAh lithium-ion",
-      chargeTime: "2.5 hours",
-      sessions: "5–7 sessions",
-      autoShutoff: "20 minutes",
-    },
-    "5 Level": {
-      battery: "2500 mAh lithium-ion",
-      chargeTime: "3 hours",
-      sessions: "5–7 sessions",
-      autoShutoff: "25 minutes",
-    },
-    "Red Light": {
-      battery: "3000 mAh lithium-ion",
-      chargeTime: "3.5 hours",
-      sessions: "6–8 sessions",
-      autoShutoff: "30 minutes",
-    },
-    "6 Level (3-in-1)": {
-      battery: "3000 mAh lithium-ion",
-      chargeTime: "3.5 hours",
-      sessions: "6–8 sessions",
-      autoShutoff: "30 minutes",
-    },
-    Airbag: {
-      battery: "2500 mAh lithium-ion",
-      chargeTime: "3 hours",
-      sessions: "5–7 sessions",
-      autoShutoff: "25 minutes",
-    },
-  };
-
-  const specs = base[heatLevel as keyof typeof base];
-  if (!specs) return [];
-  return [
-    { label: "Battery", value: specs.battery },
-    { label: "Charge time", value: specs.chargeTime },
-    { label: "Sessions per charge", value: specs.sessions },
-    { label: "Auto shut-off", value: specs.autoShutoff },
-  ];
-}
-
-/** Generic, product-agnostic selling points when Shopify has no prose copy. */
-function genericBullets(title: string): string[] {
-  const name = (title.split(/[,|\u2014]/)[0] ?? "")
-    .replace(/^\d+\s*(pair|pcs?|pack)s?\b/i, "")
-    .trim()
-    .split(/\s+/)
-    .slice(0, 4)
-    .join(" ")
-    .toLowerCase();
-  return [
-    `Everyday comfort and support from our ${name || "wellness"} range.`,
-    "Lightweight, breathable build designed for all-day wear.",
-    "Unisex fit with easy sizing — see the size guide in the options above.",
-    "Backed by free shipping, 30-day returns, and a 1-year warranty.",
-  ];
-}
 
 function formatPrice(amount: string, currencyCode: string) {
   return `${currencyCode} ${parseFloat(amount).toFixed(2)}`;
@@ -393,20 +327,10 @@ function ProductDetailPage() {
   const savings = compareAtAmount - parseFloat(price.amount);
   const savingsPercent = compareAtAmount > 0 ? Math.round((savings / compareAtAmount) * 100) : 0;
 
-  const heatLevel = model.axisNames[0] === "Heat level" ? (selection[0] ?? "") : "";
   const reviewStats = useMemo(() => getReviewStats(handle), [handle]);
-  const parsed = useMemo(() => parseDescription(product.description ?? ""), [product.description]);
   const isSleepMask = handle === SLEEP_MASK_HANDLE;
-  const bullets = useMemo(
-    () => isSleepMask ? SLEEP_MASK_BULLETS : (parsed.bullets.length ? parsed.bullets : genericBullets(product.title)),
-    [isSleepMask, parsed.bullets, product.title],
-  );
-  const specs = useMemo(() => {
-    if (isSleepMask) return SLEEP_MASK_SPECS;
-    const heatSpecs = getSpecsForHeatLevel(heatLevel);
-    if (heatSpecs.length) return heatSpecs;
-    return parsed.specs;
-  }, [heatLevel, isSleepMask, parsed.specs]);
+  const bullets = SLEEP_MASK_BULLETS;
+  const specs = SLEEP_MASK_SPECS;
   const selectedVariantName = selectedVariant
     ? selection.filter(Boolean).join(" — ") || selectedVariant.title
     : "Select options";
