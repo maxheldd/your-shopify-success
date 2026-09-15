@@ -29,7 +29,6 @@ import { getProductByHandle } from "@/lib/shopify.functions";
 import { useCartStore } from "@/stores/cartStore";
 import { ProductGallery } from "@/components/ProductGallery";
 import { ProductAccordions } from "@/components/ProductAccordions";
-import { parseDescription } from "@/lib/sanitizeDescription";
 import { ProductReviews, StarRating, getReviewStats } from "@/components/ProductReviews";
 import { useInView } from "@/hooks/useInView";
 import { cn } from "@/lib/utils";
@@ -328,7 +327,6 @@ function ProductDetailPage() {
   const savingsPercent = compareAtAmount > 0 ? Math.round((savings / compareAtAmount) * 100) : 0;
 
   const reviewStats = useMemo(() => getReviewStats(handle), [handle]);
-  const isSleepMask = handle === SLEEP_MASK_HANDLE;
   const bullets = SLEEP_MASK_BULLETS;
   const specs = SLEEP_MASK_SPECS;
   const selectedVariantName = selectedVariant
