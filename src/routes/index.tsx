@@ -1,75 +1,60 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ProductCard } from "@/components/ProductCard";
-import { getProducts, getProductByHandle } from "@/lib/shopify.functions";
+import { getProductByHandle } from "@/lib/shopify.functions";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Truck, ShieldCheck, RefreshCcw, Lock } from "lucide-react";
-import { StarRating, getReviewStats } from "@/components/ProductReviews";
+import { ArrowRight, Feather, Moon, RefreshCcw, ShieldCheck } from "lucide-react";
 import type { ShopifyProduct } from "@/lib/shopify";
 
-const HERO_HANDLE = "c0q-travel-neck-pillow-360-degree-support-for-office-nap-airplane-flight-comfortable-portable-u-shape-neck-rest-1";
-
-/** Only these products are shown on the storefront. */
-const VISIBLE_HANDLES = [HERO_HANDLE];
+const HERO_HANDLE = "100-mulberry-silk-sleeping-mask-eyepatch-blocking-light-eyemask-eyeshade-for-travel-nap-soft-padded-sleep-mask-slaapmasker";
+const HERO_IMAGE = "https://cdn.shopify.com/s/files/1/1017/3969/2349/files/S4d17e9883fd2413d9c94cef9176e54a5T.webp?v=1789490897";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Caesar Goods — 360° Travel Neck Pillow" },
-      { name: "description", content: "The 360-degree U-shaped travel neck pillow for flights, commutes and office naps. Free shipping and 30-day returns." },
-      { property: "og:title", content: "Caesar Goods — 360° Travel Neck Pillow" },
-      { property: "og:description", content: "The 360-degree U-shaped travel neck pillow for flights, commutes and office naps. Free shipping and 30-day returns." },
+      { title: "Mulberry Silk Sleep Mask | Caesar Goods" },
+      { name: "description", content: "A breathable mulberry silk sleep mask with contoured eye cups, full blackout coverage, and an adjustable soft strap." },
+      { property: "og:title", content: "Mulberry Silk Sleep Mask | Caesar Goods" },
+      { property: "og:description", content: "Gentle on skin and lashes, with pressure-free eye cups and full blackout comfort." },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: HERO_IMAGE },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: HERO_IMAGE },
     ],
   }),
   loader: async ({ context }) => {
-    const [products, heroProduct] = await Promise.all([
-      context.queryClient.ensureQueryData({
-        queryKey: ["products"],
-        queryFn: () => getProducts({ data: { first: 20 } }),
-      }),
-      context.queryClient.ensureQueryData({
-        queryKey: ["product", HERO_HANDLE],
-        queryFn: () => getProductByHandle({ data: { handle: HERO_HANDLE } }),
-      }),
-    ]);
-    return { products, heroProduct };
+    const heroProduct = await context.queryClient.ensureQueryData({
+      queryKey: ["product", HERO_HANDLE],
+      queryFn: () => getProductByHandle({ data: { handle: HERO_HANDLE } }),
+    });
+    return { heroProduct };
   },
   component: Index,
 });
-
-import { parseDescription } from "@/lib/sanitizeDescription";
 
 function formatPrice(amount: string, currencyCode: string) {
   return `${currencyCode} ${parseFloat(amount).toFixed(2)}`;
 }
 
-function getHeroBullets(description: string) {
-  return parseDescription(description).bullets.slice(0, 3);
-}
-
 const trustItems = [
-  { icon: Truck, label: "Free shipping" },
+  { icon: Feather, label: "Mulberry silk" },
+  { icon: Moon, label: "Full blackout" },
   { icon: RefreshCcw, label: "30-day returns" },
-  { icon: ShieldCheck, label: "1-year warranty" },
-  { icon: Lock, label: "Secure checkout" },
+  { icon: ShieldCheck, label: "Secure checkout" },
+];
+
+const heroBullets = [
+  "Smooth silk helps reduce friction against delicate facial skin.",
+  "Contoured eye cups leave room for your lashes and eyelids.",
+  "A soft adjustable strap creates comfortable, full blackout coverage.",
 ];
 
 function HeroProduct({ node }: { node: ShopifyProduct["node"] }) {
   const image = node.images.edges[0]?.node;
   const variant = node.variants.edges[0]?.node;
   const price = variant?.price ?? node.priceRange.minVariantPrice;
-  const compareAt = variant?.compareAtPrice;
-  const compareAmount = compareAt?.amount ? parseFloat(compareAt.amount) : 0;
-  const saleAmount = parseFloat(price.amount);
-  const showCompare = compareAmount > saleAmount;
-  const savings = showCompare ? Math.round((1 - saleAmount / compareAmount) * 100) : 0;
-
-  const bullets = getHeroBullets(node.description);
 
   return (
-    <section className="px-4 py-8 md:py-12 lg:py-16">
+    <section className="px-4 py-7 md:py-12 lg:py-14">
       <div className="mx-auto max-w-6xl">
         <div className="grid items-center gap-6 lg:grid-cols-2 lg:gap-12">
           <Link
@@ -92,58 +77,37 @@ function HeroProduct({ node }: { node: ShopifyProduct["node"] }) {
 
           <div className="order-2 flex flex-col justify-center lg:order-2">
             <span className="inline-flex w-fit items-center rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
-              Featured
+              Nightly skin comfort
             </span>
             <h1 className="mt-3 text-2xl font-semibold leading-[1.15] tracking-tight md:text-4xl lg:text-[2.5rem]">
-              {node.title}
+              Mulberry Silk Anti-Acne Sleep Mask
             </h1>
-
-            <div className="mt-3 flex items-center gap-2">
-              <StarRating rating={getReviewStats(node.handle).average} size="md" />
-              <span className="text-sm text-muted-foreground">
-                {getReviewStats(node.handle).average.toFixed(1)} ({getReviewStats(node.handle).total} reviews)
-              </span>
-            </div>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">
+              A breathable, pressure-free sleep mask designed to protect your skincare routine while blocking unwanted light.
+            </p>
 
             <div className="mt-4 flex flex-wrap items-center gap-2.5">
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-semibold md:text-3xl">
                   {formatPrice(price.amount, price.currencyCode)}
                 </span>
-                {showCompare && compareAt && (
-                  <span className="text-base text-muted-foreground line-through">
-                    {formatPrice(compareAt.amount, compareAt.currencyCode)}
-                  </span>
-                )}
               </div>
-              {savings > 0 && (
-                <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
-                  Save {savings}%
-                </span>
-              )}
             </div>
 
-            {bullets.length > 0 && (
               <ul className="mt-5 space-y-2 text-sm text-muted-foreground md:text-base">
-                {bullets.map((bullet, i) => (
-                  <li key={i} className="flex items-start gap-2.5">
+                {heroBullets.map((bullet) => (
+                  <li key={bullet} className="flex items-start gap-2.5">
                     <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                     <span className="leading-relaxed">{bullet}</span>
                   </li>
                 ))}
               </ul>
-            )}
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <Button asChild size="lg" className="gap-2">
                 <Link to="/product/$handle" params={{ handle: node.handle }}>
-                  Shop Now
+                  Choose your color
                   <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link to="/product/$handle" params={{ handle: node.handle }} hash="reviews">
-                  Read Reviews
                 </Link>
               </Button>
             </div>
@@ -164,37 +128,14 @@ function HeroProduct({ node }: { node: ShopifyProduct["node"] }) {
 }
 
 function Index() {
-  const { data: products } = useSuspenseQuery({
-    queryKey: ["products"],
-    queryFn: () => getProducts({ data: { first: 20 } }),
-  });
   const { data: heroProduct } = useSuspenseQuery({
     queryKey: ["product", HERO_HANDLE],
     queryFn: () => getProductByHandle({ data: { handle: HERO_HANDLE } }),
   });
 
-  const gridProducts = products?.filter(
-    (product) =>
-      VISIBLE_HANDLES.includes(product.node.handle) &&
-      product.node.handle !== HERO_HANDLE,
-  );
-
   return (
     <main className="min-h-screen">
       {heroProduct && <HeroProduct node={heroProduct} />}
-
-      {gridProducts && gridProducts.length > 0 && (
-        <section id="products" className="px-4 pb-16 md:pb-24">
-          <div className="mx-auto max-w-7xl">
-            <h2 className="text-2xl font-bold tracking-tight mb-8">Featured Products</h2>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {gridProducts.map((product) => (
-                <ProductCard key={product.node.id} product={product} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
     </main>
   );
 }

@@ -13,29 +13,50 @@ import {
 } from "@/components/ui/select";
 import {
   ArrowLeft,
+  Feather,
+  Eye,
   Loader2,
   Minus,
+  Moon,
   Package,
   Plus,
   RefreshCw,
   ShieldCheck,
   ShoppingCart,
   Truck,
-  Zap,
 } from "lucide-react";
 import { getProductByHandle } from "@/lib/shopify.functions";
 import { useCartStore } from "@/stores/cartStore";
 import { ProductGallery } from "@/components/ProductGallery";
 import { ProductAccordions } from "@/components/ProductAccordions";
-import { parseDescription } from "@/lib/sanitizeDescription";
 import { ProductReviews, StarRating, getReviewStats } from "@/components/ProductReviews";
 import { useInView } from "@/hooks/useInView";
 import { cn } from "@/lib/utils";
 import { buildVariantModel, findVariant, valuesForAxis } from "@/lib/variantOptions";
 import { fbqTrack } from "@/lib/fbq";
 
+const SLEEP_MASK_HANDLE = "100-mulberry-silk-sleeping-mask-eyepatch-blocking-light-eyemask-eyeshade-for-travel-nap-soft-padded-sleep-mask-slaapmasker";
+const SLEEP_MASK_TITLE = "Mulberry Silk Anti-Acne Sleep Mask";
+const SLEEP_MASK_BULLETS = [
+  "Smooth mulberry silk creates less friction against delicate facial skin than ordinary cotton.",
+  "Contoured eye cups leave room to blink and help protect lashes from pressure.",
+  "Full blackout coverage creates a darker sleep environment without unnecessary weight.",
+  "A soft adjustable strap gives a comfortable fit for sleep, travel, and daytime naps.",
+];
+const SLEEP_MASK_SPECS = [
+  { label: "Material", value: "Mulberry silk" },
+  { label: "Design", value: "Contoured 3D eye cups" },
+  { label: "Fit", value: "Adjustable soft strap" },
+  { label: "Coverage", value: "Full blackout" },
+];
+
+function displayTitle(handle: string, title: string) {
+  return handle === SLEEP_MASK_HANDLE ? SLEEP_MASK_TITLE : title;
+}
+
 export const Route = createFileRoute("/product/$handle")({
   loader: async ({ params, context }) => {
+    if (params.handle !== SLEEP_MASK_HANDLE) throw notFound();
     const product = await context.queryClient.ensureQueryData({
       queryKey: ["product", params.handle],
       queryFn: () => getProductByHandle({ data: { handle: params.handle } }),
@@ -53,10 +74,12 @@ export const Route = createFileRoute("/product/$handle")({
         ],
       };
     }
-    const title = `${product.title} | Caesar Goods`;
-    const description =
-      product.description?.replace(/\s+/g, " ").trim().slice(0, 155) ||
-      "Shop premium wellness and recovery gear at Caesar Goods.";
+    const productTitle = displayTitle(product.handle, product.title);
+    const title = `${productTitle} | Caesar Goods`;
+    const description = product.handle === SLEEP_MASK_HANDLE
+      ? "A breathable mulberry silk sleep mask with pressure-free eye cups, full blackout coverage, and an adjustable soft strap."
+      : product.description?.replace(/\s+/g, " ").trim().slice(0, 155) ||
+        "Shop premium wellness and recovery gear at Caesar Goods.";
     const image = product.images?.edges?.[0]?.node?.url;
     return {
       meta: [
@@ -88,73 +111,6 @@ export const Route = createFileRoute("/product/$handle")({
     </div>
   ),
 });
-
-function getSpecsForHeatLevel(heatLevel: string) {
-  const base = {
-    "3 Level": {
-      battery: "2000 mAh lithium-ion",
-      chargeTime: "2.5 hours",
-      sessions: "4–6 sessions",
-      autoShutoff: "20 minutes",
-    },
-    "4 Level": {
-      battery: "2200 mAh lithium-ion",
-      chargeTime: "2.5 hours",
-      sessions: "5–7 sessions",
-      autoShutoff: "20 minutes",
-    },
-    "5 Level": {
-      battery: "2500 mAh lithium-ion",
-      chargeTime: "3 hours",
-      sessions: "5–7 sessions",
-      autoShutoff: "25 minutes",
-    },
-    "Red Light": {
-      battery: "3000 mAh lithium-ion",
-      chargeTime: "3.5 hours",
-      sessions: "6–8 sessions",
-      autoShutoff: "30 minutes",
-    },
-    "6 Level (3-in-1)": {
-      battery: "3000 mAh lithium-ion",
-      chargeTime: "3.5 hours",
-      sessions: "6–8 sessions",
-      autoShutoff: "30 minutes",
-    },
-    Airbag: {
-      battery: "2500 mAh lithium-ion",
-      chargeTime: "3 hours",
-      sessions: "5–7 sessions",
-      autoShutoff: "25 minutes",
-    },
-  };
-
-  const specs = base[heatLevel as keyof typeof base];
-  if (!specs) return [];
-  return [
-    { label: "Battery", value: specs.battery },
-    { label: "Charge time", value: specs.chargeTime },
-    { label: "Sessions per charge", value: specs.sessions },
-    { label: "Auto shut-off", value: specs.autoShutoff },
-  ];
-}
-
-/** Generic, product-agnostic selling points when Shopify has no prose copy. */
-function genericBullets(title: string): string[] {
-  const name = (title.split(/[,|\u2014]/)[0] ?? "")
-    .replace(/^\d+\s*(pair|pcs?|pack)s?\b/i, "")
-    .trim()
-    .split(/\s+/)
-    .slice(0, 4)
-    .join(" ")
-    .toLowerCase();
-  return [
-    `Everyday comfort and support from our ${name || "wellness"} range.`,
-    "Lightweight, breathable build designed for all-day wear.",
-    "Unisex fit with easy sizing — see the size guide in the options above.",
-    "Backed by free shipping, 30-day returns, and a 1-year warranty.",
-  ];
-}
 
 function formatPrice(amount: string, currencyCode: string) {
   return `${currencyCode} ${parseFloat(amount).toFixed(2)}`;
@@ -212,8 +168,8 @@ function TrustRow() {
   const items = [
     { icon: Truck, label: "Free shipping" },
     { icon: RefreshCw, label: "30-day returns" },
-    { icon: ShieldCheck, label: "CE / FCC / RoHS" },
-    { icon: Package, label: "1-year warranty" },
+    { icon: Feather, label: "Gentle silk surface" },
+    { icon: ShieldCheck, label: "Secure checkout" },
   ];
 
   return (
@@ -230,10 +186,10 @@ function TrustRow() {
 
 function FeatureStrip() {
   const features = [
-    { icon: Zap, title: "Adjustable heat", description: "Three to six warmth levels to match your comfort." },
-    { icon: RefreshCw, title: "Three vibration modes", description: "Pulse, wave, and constant settings." },
-    { icon: ShieldCheck, title: "Auto shut-off", description: "Timed safety shut-off after every session." },
-    { icon: Package, title: "Overheat protection", description: "Built-in sensor keeps heat within a safe range." },
+    { icon: Feather, title: "Smooth silk", description: "A soft surface that minimizes tugging and friction on delicate skin." },
+    { icon: Eye, title: "Pressure-free fit", description: "Contoured eye cups give your eyelids and lashes room to move." },
+    { icon: Moon, title: "Full blackout", description: "Light-blocking coverage supports deeper rest at home or away." },
+    { icon: Package, title: "Travel ready", description: "Lightweight comfort for flights, naps, and changing schedules." },
   ];
 
   return (
@@ -366,23 +322,13 @@ function ProductDetailPage() {
   const listedCompareAt = selectedVariant?.compareAtPrice
     ? parseFloat(selectedVariant.compareAtPrice.amount)
     : 0;
-  const compareAtAmount =
-    listedCompareAt > parseFloat(price.amount) ? listedCompareAt : parseFloat(price.amount) * 2;
+  const compareAtAmount = listedCompareAt > parseFloat(price.amount) ? listedCompareAt : 0;
   const savings = compareAtAmount - parseFloat(price.amount);
   const savingsPercent = compareAtAmount > 0 ? Math.round((savings / compareAtAmount) * 100) : 0;
 
-  const heatLevel = model.axisNames[0] === "Heat level" ? (selection[0] ?? "") : "";
   const reviewStats = useMemo(() => getReviewStats(handle), [handle]);
-  const parsed = useMemo(() => parseDescription(product.description ?? ""), [product.description]);
-  const bullets = useMemo(
-    () => (parsed.bullets.length ? parsed.bullets : genericBullets(product.title)),
-    [parsed.bullets, product.title],
-  );
-  const specs = useMemo(() => {
-    const heatSpecs = getSpecsForHeatLevel(heatLevel);
-    if (heatSpecs.length) return heatSpecs;
-    return parsed.specs;
-  }, [heatLevel, parsed.specs]);
+  const bullets = SLEEP_MASK_BULLETS;
+  const specs = SLEEP_MASK_SPECS;
   const selectedVariantName = selectedVariant
     ? selection.filter(Boolean).join(" — ") || selectedVariant.title
     : "Select options";
@@ -414,7 +360,7 @@ function ProductDetailPage() {
             </Badge>
 
             <h1 className="break-words text-2xl font-bold leading-tight tracking-tight sm:text-3xl md:text-4xl">
-              {product.title}
+              {displayTitle(handle, product.title)}
             </h1>
 
             <a
@@ -422,7 +368,9 @@ function ProductDetailPage() {
               className="mt-3 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
             >
               <StarRating rating={reviewStats.average} />
-              <span className="underline-offset-2 hover:underline">{reviewStats.total} reviews</span>
+              <span className="underline-offset-2 hover:underline">
+                {reviewStats.total > 0 ? `${reviewStats.total} reviews` : "No reviews yet"}
+              </span>
             </a>
 
             <div className="mt-4 flex flex-wrap items-baseline gap-3">
