@@ -1,7 +1,6 @@
 # Project Roadmap
 
 ## Open
-- [ ] Import the uploaded AliExpress sleep-mask reviews into the storefront
 - [ ] Publish the anti-acne sleep mask storefront when requested
 
 ## Completed
@@ -12,3 +11,4 @@
 - [x] Per-product SEO metadata (title, description, og:image) on product pages
 - [x] Cart drawer with Storefront API checkout
 - [x] Replace storefront catalog and content with the mulberry silk anti-acne sleep mask
+- [x] Import the uploaded AliExpress sleep-mask reviews, ratings, and customer photos
