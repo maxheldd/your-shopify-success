@@ -1,6 +1,7 @@
 # Project Roadmap
 
 ## Open
+- [ ] Import the uploaded AliExpress sleep-mask reviews into the storefront
 - [ ] Publish the anti-acne sleep mask storefront when requested
 
 ## Completed
