@@ -4,9 +4,9 @@ import { getProductByHandle } from "@/lib/shopify.functions";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Feather, Moon, RefreshCcw, ShieldCheck } from "lucide-react";
 import type { ShopifyProduct } from "@/lib/shopify";
-import { ImageMarquee } from "@/components/ImageMarquee";
 import { ReviewMarquee } from "@/components/ReviewMarquee";
 import { ProductReviews } from "@/components/ProductReviews";
+import heroImageAsset from "@/assets/hero-sleep-mask.png.asset.json";
 
 const HERO_HANDLE = "100-mulberry-silk-sleeping-mask-eyepatch-blocking-light-eyemask-eyeshade-for-travel-nap-soft-padded-sleep-mask-slaapmasker";
 const HERO_IMAGE = "https://cdn.shopify.com/s/files/1/1017/3969/2349/files/S4d17e9883fd2413d9c94cef9176e54a5T.webp?v=1789490897";
@@ -52,7 +52,7 @@ const heroBullets = [
 ];
 
 function HeroProduct({ node }: { node: ShopifyProduct["node"] }) {
-  const image = node.images.edges[0]?.node;
+  const image = { url: heroImageAsset.url, altText: "Woman sleeping wearing a blue mulberry silk sleep mask" };
   const variant = node.variants.edges[0]?.node;
   const price = variant?.price ?? node.priceRange.minVariantPrice;
 
@@ -136,11 +136,9 @@ function Index() {
     queryFn: () => getProductByHandle({ data: { handle: HERO_HANDLE } }),
   });
 
-  const galleryImages = heroProduct?.images.edges.map((edge) => edge.node) ?? [];
-
   return (
     <main className="min-h-screen">
-      <ImageMarquee images={galleryImages} alt="Mulberry silk sleep mask" />
+      <ReviewMarquee />
       {heroProduct && <HeroProduct node={heroProduct} />}
 
       <section id="reviews" className="px-4 py-10 md:py-14">
@@ -155,7 +153,6 @@ function Index() {
         </div>
       </section>
 
-      <ReviewMarquee />
     </main>
   );
 }
