@@ -52,7 +52,7 @@ const HIDDEN_IMAGE_FILES = new Set([
 ]);
 const DUPLICATE_PINK_FILE = "S79e85860784842a39db6202618f39a37F.webp";
 const KEPT_PINK_FILE = "S6968e44b9dc746a9afad754db7550edck.webp";
-const imageFile = (url: string) => url.split("?")[0].split("/").pop() ?? "";
+const imageFile = (url: string) => (url.split("?")[0] ?? url).split("/").pop() ?? "";
 import { ProductAccordions } from "@/components/ProductAccordions";
 import { ProductReviews, StarRating, getReviewStats } from "@/components/ProductReviews";
 import { useInView } from "@/hooks/useInView";
