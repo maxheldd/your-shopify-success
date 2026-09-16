@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { ShopifyProductImage } from "@/lib/shopify";
 
@@ -14,6 +14,12 @@ export function ProductGallery({ images, alt, selectedImageUrl }: ProductGallery
     const index = images.findIndex((img) => img.url === selectedImageUrl);
     return index >= 0 ? index : 0;
   });
+
+  useEffect(() => {
+    if (!selectedImageUrl) return;
+    const index = images.findIndex((img) => img.url === selectedImageUrl);
+    if (index >= 0) setMainIndex(index);
+  }, [selectedImageUrl, images]);
 
   const mainImage = images[mainIndex];
 
