@@ -39,6 +39,20 @@ const PRODUCT_IMAGES = [
   { url: maskImage3.url, altText: "Close up of the blue silk sleep mask while sleeping" },
   { url: maskImage4.url, altText: "Design details: velcro strap, triangle wing and travel bag" },
 ];
+
+// Shopify gallery images hidden from the storefront: the first five graphics
+// plus the duplicate pink shot (the first pink photo is kept).
+const HIDDEN_IMAGE_FILES = new Set([
+  "S4d17e9883fd2413d9c94cef9176e54a5T.webp",
+  "Secf69a8694a44591bcc0370415353228b.webp",
+  "S4425318b5c9041af9eefd5b495be792en.webp",
+  "S21ec852eff4f41f19a11de75f81c8d05h.webp",
+  "S1a166e5198d04892b4d5c6212bc29265k.webp",
+  "S79e85860784842a39db6202618f39a37F.webp",
+]);
+const DUPLICATE_PINK_FILE = "S79e85860784842a39db6202618f39a37F.webp";
+const KEPT_PINK_FILE = "S6968e44b9dc746a9afad754db7550edck.webp";
+const imageFile = (url: string) => (url.split("?")[0] ?? url).split("/").pop() ?? "";
 import { ProductAccordions } from "@/components/ProductAccordions";
 import { ProductReviews, StarRating, getReviewStats } from "@/components/ProductReviews";
 import { useInView } from "@/hooks/useInView";
@@ -235,7 +249,12 @@ function ProductDetailPage() {
     [product.variants.edges],
   );
   const images = useMemo(
-    () => [...PRODUCT_IMAGES, ...product.images.edges.map((edge) => edge.node)],
+    () => [
+      ...PRODUCT_IMAGES,
+      ...product.images.edges
+        .map((edge) => edge.node)
+        .filter((node) => !HIDDEN_IMAGE_FILES.has(imageFile(node.url))),
+    ],
     [product.images.edges],
   );
 
@@ -278,10 +297,15 @@ function ProductDetailPage() {
     [model, selection],
   );
 
-  // Jump gallery to variant image when selection changes
+  // Jump gallery to variant image when selection changes. The Pink variant
+  // points at the removed duplicate photo, so swap in the kept pink shot.
   useEffect(() => {
     if (selectedVariant?.image?.url) {
-      setSelectedImageUrl(selectedVariant.image.url);
+      setSelectedImageUrl(
+        imageFile(selectedVariant.image.url) === DUPLICATE_PINK_FILE
+          ? selectedVariant.image.url.replace(DUPLICATE_PINK_FILE, KEPT_PINK_FILE)
+          : selectedVariant.image.url,
+      );
     }
   }, [selectedVariant?.image?.url]);
 
