@@ -4,6 +4,9 @@ import { getProductByHandle } from "@/lib/shopify.functions";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Feather, Moon, RefreshCcw, ShieldCheck } from "lucide-react";
 import type { ShopifyProduct } from "@/lib/shopify";
+import { ImageMarquee } from "@/components/ImageMarquee";
+import { ReviewMarquee } from "@/components/ReviewMarquee";
+import { ProductReviews } from "@/components/ProductReviews";
 
 const HERO_HANDLE = "100-mulberry-silk-sleeping-mask-eyepatch-blocking-light-eyemask-eyeshade-for-travel-nap-soft-padded-sleep-mask-slaapmasker";
 const HERO_IMAGE = "https://cdn.shopify.com/s/files/1/1017/3969/2349/files/S4d17e9883fd2413d9c94cef9176e54a5T.webp?v=1789490897";
@@ -133,9 +136,26 @@ function Index() {
     queryFn: () => getProductByHandle({ data: { handle: HERO_HANDLE } }),
   });
 
+  const galleryImages = heroProduct?.node.images.edges.map((edge) => edge.node) ?? [];
+
   return (
     <main className="min-h-screen">
+      <ImageMarquee images={galleryImages} alt="Mulberry silk sleep mask" />
       {heroProduct && <HeroProduct node={heroProduct} />}
+
+      <section id="reviews" className="px-4 py-10 md:py-14">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="text-xl font-semibold tracking-tight md:text-2xl">What sleepers say</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Real feedback from verified buyers of the mulberry silk sleep mask.
+          </p>
+          <div className="mt-6">
+            <ProductReviews handle={HERO_HANDLE} />
+          </div>
+        </div>
+      </section>
+
+      <ReviewMarquee />
     </main>
   );
 }
