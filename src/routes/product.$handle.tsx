@@ -234,7 +234,10 @@ function ProductDetailPage() {
     () => product.variants.edges.map((edge) => edge.node),
     [product.variants.edges],
   );
-  const images = useMemo(() => PRODUCT_IMAGES, []);
+  const images = useMemo(
+    () => [...PRODUCT_IMAGES, ...product.images.edges.map((edge) => edge.node)],
+    [product.images.edges],
+  );
 
   const model = useMemo(
     () => buildVariantModel(variants, product.options ?? []),
@@ -358,7 +361,7 @@ function ProductDetailPage() {
             <ProductGallery
               images={images}
               alt={product.title}
-              selectedImageUrl={null}
+              selectedImageUrl={selectedImageUrl}
             />
           </FadeIn>
 
