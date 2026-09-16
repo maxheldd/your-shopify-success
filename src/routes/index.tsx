@@ -136,7 +136,7 @@ function Index() {
     queryFn: () => getProductByHandle({ data: { handle: HERO_HANDLE } }),
   });
 
-  const galleryImages = heroProduct?.node.images.edges.map((edge) => edge.node) ?? [];
+  const galleryImages = heroProduct?.images.edges.map((edge) => edge.node) ?? [];
 
   return (
     <main className="min-h-screen">
