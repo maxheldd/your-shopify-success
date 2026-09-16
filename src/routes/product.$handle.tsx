@@ -249,7 +249,12 @@ function ProductDetailPage() {
     [product.variants.edges],
   );
   const images = useMemo(
-    () => [...PRODUCT_IMAGES, ...product.images.edges.map((edge) => edge.node)],
+    () => [
+      ...PRODUCT_IMAGES,
+      ...product.images.edges
+        .map((edge) => edge.node)
+        .filter((node) => !HIDDEN_IMAGE_FILES.has(imageFile(node.url))),
+    ],
     [product.images.edges],
   );
 
