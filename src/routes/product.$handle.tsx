@@ -297,10 +297,15 @@ function ProductDetailPage() {
     [model, selection],
   );
 
-  // Jump gallery to variant image when selection changes
+  // Jump gallery to variant image when selection changes. The Pink variant
+  // points at the removed duplicate photo, so swap in the kept pink shot.
   useEffect(() => {
     if (selectedVariant?.image?.url) {
-      setSelectedImageUrl(selectedVariant.image.url);
+      setSelectedImageUrl(
+        imageFile(selectedVariant.image.url) === DUPLICATE_PINK_FILE
+          ? selectedVariant.image.url.replace(DUPLICATE_PINK_FILE, KEPT_PINK_FILE)
+          : selectedVariant.image.url,
+      );
     }
   }, [selectedVariant?.image?.url]);
 
