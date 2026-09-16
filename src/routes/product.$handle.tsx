@@ -28,6 +28,17 @@ import {
 import { getProductByHandle } from "@/lib/shopify.functions";
 import { useCartStore } from "@/stores/cartStore";
 import { ProductGallery } from "@/components/ProductGallery";
+import heroImageAsset from "@/assets/hero-sleep-mask.png.asset.json";
+import maskImage2 from "@/assets/sleep-mask-2.png.asset.json";
+import maskImage3 from "@/assets/sleep-mask-3.png.asset.json";
+import maskImage4 from "@/assets/sleep-mask-4.png.asset.json";
+
+const PRODUCT_IMAGES = [
+  { url: heroImageAsset.url, altText: "Woman asleep wearing the blue silk sleep mask" },
+  { url: maskImage2.url, altText: "Woman placing the blue silk sleep mask over her eyes" },
+  { url: maskImage3.url, altText: "Close up of the blue silk sleep mask while sleeping" },
+  { url: maskImage4.url, altText: "Design details: velcro strap, triangle wing and travel bag" },
+];
 import { ProductAccordions } from "@/components/ProductAccordions";
 import { ProductReviews, StarRating, getReviewStats } from "@/components/ProductReviews";
 import { useInView } from "@/hooks/useInView";
@@ -223,10 +234,7 @@ function ProductDetailPage() {
     () => product.variants.edges.map((edge) => edge.node),
     [product.variants.edges],
   );
-  const images = useMemo(
-    () => product.images.edges.map((edge) => edge.node),
-    [product.images.edges],
-  );
+  const images = useMemo(() => PRODUCT_IMAGES, []);
 
   const model = useMemo(
     () => buildVariantModel(variants, product.options ?? []),
@@ -350,7 +358,7 @@ function ProductDetailPage() {
             <ProductGallery
               images={images}
               alt={product.title}
-              selectedImageUrl={selectedImageUrl}
+              selectedImageUrl={null}
             />
           </FadeIn>
 
