@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Feather, Moon, RefreshCcw, ShieldCheck } from "lucide-react";
 import type { ShopifyProduct } from "@/lib/shopify";
 import { ReviewMarquee } from "@/components/ReviewMarquee";
-import { ProductReviews } from "@/components/ProductReviews";
+import { ProductReviews, StarRating, getReviewStats } from "@/components/ProductReviews";
 import heroImageAsset from "@/assets/hero-sleep-mask.png.asset.json";
 
 const HERO_HANDLE = "100-mulberry-silk-sleeping-mask-eyepatch-blocking-light-eyemask-eyeshade-for-travel-nap-soft-padded-sleep-mask-slaapmasker";
@@ -55,6 +55,7 @@ function HeroProduct({ node }: { node: ShopifyProduct["node"] }) {
   const image = { url: heroImageAsset.url, altText: "Woman sleeping wearing a blue mulberry silk sleep mask" };
   const variant = node.variants.edges[0]?.node;
   const price = variant?.price ?? node.priceRange.minVariantPrice;
+  const heroStats = getReviewStats(node.handle);
 
   return (
     <section className="px-4 py-7 md:py-12 lg:py-14">
@@ -85,6 +86,13 @@ function HeroProduct({ node }: { node: ShopifyProduct["node"] }) {
             <h1 className="mt-3 text-2xl font-semibold leading-[1.15] tracking-tight md:text-4xl lg:text-[2.5rem]">
               Mulberry Silk Anti-Acne Sleep Mask
             </h1>
+            <a href="#reviews" className="mt-3 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+              <StarRating rating={heroStats.average} />
+              <span className="underline-offset-2 hover:underline">
+                {heroStats.average.toFixed(1)} · {heroStats.total} reviews
+              </span>
+            </a>
+
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">
               A breathable, pressure-free sleep mask designed to protect your skincare routine while blocking unwanted light.
             </p>
